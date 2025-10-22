@@ -1,33 +1,63 @@
-A modern HR Management System for Al Nada Int’l Exchange Co., built with Next.js (App Router + Javascript), springboot, and PostgreSQL/SQL Server. It supports Arabic & English, Kuwait (GMT+3) timezone, role-based access, payroll, leave, attendance, and approvals.
+# 🏢 Al Nada HR Management System (HRMS)
 
-✨ Features
+A **modern Human Resource Management System** for **Al Nada Int’l Exchange Co.**, built with **Next.js (App Router + JavaScript)** in frontend.  
+It supports **Arabic & English**, **Kuwait (GMT + 3)** timezone, and provides **role-based access**, **payroll**, **leave**, **attendance**, and **approval workflows**.
 
-Auth & RBAC: Email/Password or SSO (optional), roles: Admin, HR, Manager, Employee.
+---
 
-CORE HR: All Employee Information, contracts, documents, dependents, IDs, bank accounts.
+## ✨ Features
 
-Audit & Logs: every sensitive action tracked.
+### 🔐 Auth & RBAC
+- Email / Password authentication or optional SSO.  
+- Roles: **Admin**, **HR**, **Manager**, **Employee**.  
+- Role-based access control across all modules.
 
-Localization: ar/en (RTL/LTR), Hijri date display (optional), numeral formatting.
+### 👥 Core HR
+- Complete employee information management.  
+- Employee contracts, documents, dependents, IDs, and bank accounts.
 
-Emails & Notifications: SMTP & in-app toasts, optional WhatsApp/SMS hooks.
+### 🧾 Audit & Logs
+- Every sensitive action tracked with detailed logs.
 
-🧱 Tech Stack
+### 🌍 Localization
+- Full **Arabic / English** support (**RTL / LTR**).  
+- Optional Hijri date display and Kuwait numeral formatting.
 
-Frontend/SSR: Next.js (App Router), React 18, Javascript, TailwindCSS
+### ✉️ Emails & Notifications
+- SMTP-based email alerts (Microsoft 365 supported).  
+- In-app toasts and optional WhatsApp / SMS integrations.
 
-State: React Query (TanStack), Zod (schema validation)
+---
 
-Auth: NextAuth (Credentials / OAuth2 provider optional)
+## 🧱 Tech Stack
 
-DB: PostgreSQL 17+ (default) or SQL Server 2019+ (set provider in Prisma)
+| Layer                         | Technologies                                                  |
+|-------------------------------|---------------------------------------------------------------|
+| **Frontend / SSR**            | Next.js (App Router), React 18, JavaScript, Tailwind CSS      |
+| **State Management**          | Redux                                                         |
+| **Authentication**            | NextAuth (Credentials or OAuth2 provider optional)            |
+| **Backend**                   | Spring Boot (Java 17 +) REST API                              |
+| **Database**                  | PostgreSQL 17 + (default) or SQL Server 2019                  |
+| **File Storage**              | S3-compatible (MinIO / AWS) or local `/uploads` folder        |
+| **Email**                     | SMTP (e.g., Microsoft 365 / Exchange Online)                  |
+| **Testing**                   | Vitest + Testing Library + Playwright (e2e)                   |
+| **CI / CD**                   | GitHub Actions pipelines                                      |
+| **Package Manager**           | pnpm (latest LTS)                                             |
 
-Files: S3-compatible (MinIO/AWS) or local /uploads
+---
 
-Email: SMTP (e.g., Microsoft 365)
+## 🕒 Timezone & Locale
+All timestamps normalized to **Asia/Kuwait (GMT + 3)**.  
+Localized UI follows user language and RTL/LTR direction automatically.
 
-Testing: Vitest + Testing Library + Playwright (e2e)
+---
 
-CI/CD: GitHub Actions
+## 📄 License
+Internal proprietary software — © **Al Nada Int’l Exchange Co.**  
+All rights reserved. Redistribution or commercial use without authorization is prohibited.
 
-Package Manager: pnpm
+---
+
+## 📬 Contact
+For technical support or deployment assistance, contact:  
+**it@alnadaex.com**
