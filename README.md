@@ -53,11 +53,11 @@ Localized UI follows user language and RTL/LTR direction automatically.
 ---
 
 ## 📄 License
-Internal proprietary software — © **Al Nada Int’l Exchange Co.**  
+Internal proprietary software — © **Al Nada Exchange**  
 All rights reserved. Redistribution or commercial use without authorization is prohibited.
 
 ---
 
 ## 📬 Contact
 For technical support or deployment assistance, contact:  
-**it@alnadaex.com**
+**TechnicalSupport@alnadaex.com**
