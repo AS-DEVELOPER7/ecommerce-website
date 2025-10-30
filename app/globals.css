@@ -1,0 +1,147 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
+
+/* ===============================
+   Theme Tokens (HEX Values)
+   =============================== */
+
+/* Tailwind variable mapping */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-base: var(--surface-base);
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+  --color-accent: var(--color-accent);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
+  --color-info: var(--color-info);
+  /* NEW: Soft backgrounds for states + accent */
+  --color-success-bg: var(--success-bg);
+  --color-warning-bg: var(--warning-bg);
+  --color-error-bg: var(--error-bg);
+  --color-info-bg: var(--info-bg);
+  --color-bg-accent: var(--bg-accent);
+  --color-base: var(--color-base);
+  --color-muted: var(--color-muted);
+  --color-border: var(--color-border);
+  --color-input-bg: var(--input-bg);
+  --color-input-border: var(--input-border);
+  --color-overlay: var(--overlay);
+}
+
+/* 🌞 LIGHT THEME */
+:root {
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --surface-base: #f3f4f6;
+  --color-primary: #ee2b8c;
+  --color-secondary: #a8005d;
+  --color-accent: #ffd1e8;
+  --color-success: #0ea85d;
+  --color-warning: #fbbf24;
+  --color-danger: #ef4444;
+  --color-info:   #0284c7;       /* sky-600 */
+  /* NEW: Soft backgrounds (solid light tints) */
+  --success-bg: #dcfce7;   /* green-100 */
+  --warning-bg: #fef3c7;   /* amber-100 */
+  --error-bg:   #fee2e2;   /* red-100 */
+  --info-bg:    #e0f2fe;   /* sky-100 */
+  --bg-accent:  #dbeafe;   /* blue-100 */
+
+  --color-base: #1c1217;
+  --color-muted: #6b5c64;
+  --color-border: #e2d4da;
+  --input-bg: #f8fafc;
+  --input-border: #d1d5db;
+  --overlay: #00000080;
+}
+
+/* 🌙 DARK THEME */
+[data-theme="dark"] {
+  --bg: #0b0f1a;
+  --surface: #1f2937;
+  --surface-base: #2a3444;
+  --color-primary: #ff4ba1;
+  --color-secondary: #ff8ac8;
+  --color-accent: #422a38;
+  --color-success: #34d399;
+  --color-warning: #facc15;
+  --color-danger: #f87171;
+  --color-info:   #38bdf8;       /* sky-400 */
+  /* NEW: Soft backgrounds (solid, no opacity) */
+  --success-bg: #14532d;   /* dark green-900 */
+  --warning-bg: #78350f;   /* dark amber-900 */
+  --error-bg:   #7f1d1d;   /* dark red-900 */
+  --info-bg:    #0c4a6e;   /* dark sky-900 */
+  --bg-accent:  #1e3a8a;   /* dark blue-900 */
+
+  --color-base: #f9f6f7;
+  --color-muted: #bda6b1;
+  --color-border: #523343;
+  --input-bg: #2a3444;
+  --input-border: #444c5c;
+  --overlay: #ffffff12;
+}
+
+/* ===============================
+   BASE STYLES
+   =============================== */
+
+  html {
+    font-family: "Inter", system-ui, sans-serif;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--color-base);
+  }
+
+
+/* ===============================
+   COMPONENTS
+   =============================== */
+
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-md font-semibold transition duration-200 ease-in-out;
+  }
+
+  .btn-primary {
+    background-color: var(--color-primary);
+    color: #fff;
+  }
+
+  .btn-primary:hover {
+    opacity: 0.9;
+  }
+
+  .btn-outline {
+    border: 1px solid var(--color-border);
+    color: var(--color-base);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  .section-title {
+    @apply text-3xl sm:text-4xl font-bold text-center mb-8;
+    color: var(--color-base);
+  }
+
+  .card {
+    @apply bg-surface-base rounded-xl shadow-sm border border-border overflow-hidden transition-transform duration-300;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  .input {
+    @apply w-full rounded-lg h-12 px-4 border border-[var(--color-input-border)] bg-[var(--color-input-bg)] placeholder:text-[var(--color-muted)] focus:ring-2 focus:ring-[var(--color-primary)] focus:outline-none;
+  }
+
