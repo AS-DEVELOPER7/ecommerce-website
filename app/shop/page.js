@@ -18,30 +18,19 @@ import ProductCard from "src/components/molecules/ProductCard";
 import { products } from "src/data";
 import {
   CATEGORY_KEYS,
-<<<<<<< HEAD
-=======
-  CATEGORY_LIST,
->>>>>>> b11839557a023584904ffae753ac1e71a1ec3a8c
   DEFAULT_PAGE_SIZE,
   PAGE_SIZE_OPTIONS,
   MATERIAL_LIST,
   STYLE_LIST,
-<<<<<<< HEAD
   MAX_PRICE,
   CURRENCY,
-=======
->>>>>>> b11839557a023584904ffae753ac1e71a1ec3a8c
 } from "src/constants";
 
 export default function ShopPage() {
   const dispatch = useDispatch();
   const { selectedCategory } = useSelector((s) => s.general) || {};
 
-<<<<<<< HEAD
   const categories = Object.values(CATEGORY_KEYS);
-=======
-  const categories = [...CATEGORY_LIST];
->>>>>>> b11839557a023584904ffae753ac1e71a1ec3a8c
 
   // UI state
   const [activeCategory, setActiveCategory] = useState(
@@ -56,11 +45,7 @@ export default function ShopPage() {
   const [openFilters, setOpenFilters] = useState(false);
   const [materials, setMaterials] = useState([]); // selected materials
   const [styles, setStyles] = useState([]); // selected styles
-<<<<<<< HEAD
   const [maxPrice, setMaxPrice] = useState(MAX_PRICE);
-=======
-  const [maxPrice, setMaxPrice] = useState(9999);
->>>>>>> b11839557a023584904ffae753ac1e71a1ec3a8c
 
   // Derived facets (could be from constants, but here we compute what's present)
   const availableMaterials = useMemo(() => {
@@ -140,11 +125,7 @@ export default function ShopPage() {
   const clearAllFilters = () => {
     setMaterials([]);
     setStyles([]);
-<<<<<<< HEAD
     setMaxPrice(MAX_PRICE);
-=======
-    setMaxPrice(9999);
->>>>>>> b11839557a023584904ffae753ac1e71a1ec3a8c
     setSearch("");
     setSortOrder("default");
     setOpenFilters(false);
@@ -172,11 +153,7 @@ export default function ShopPage() {
           />
         </div>
 
-<<<<<<< HEAD
         {/* Sort  + Filter Toggle */}
-=======
-        {/* Sort + Page Size + Filter Toggle */}
->>>>>>> b11839557a023584904ffae753ac1e71a1ec3a8c
         <div className="flex items-center gap-3 justify-between sm:justify-end">
           <div className="flex items-center gap-2">
             <label htmlFor="sort" className="text-sm text-muted">
@@ -283,7 +260,6 @@ export default function ShopPage() {
                 <input
                   type="range"
                   min={10}
-<<<<<<< HEAD
                   max={MAX_PRICE}
                   step={5}
                   value={Math.min(maxPrice, MAX_PRICE)}
@@ -293,15 +269,6 @@ export default function ShopPage() {
                 <span className="text-sm text-muted">
                   {maxPrice} {CURRENCY}
                 </span>
-=======
-                  max={1000}
-                  step={5}
-                  value={Math.min(maxPrice, 1000)}
-                  onChange={(e) => setMaxPrice(Number(e.target.value))}
-                  className="w-full"
-                />
-                <span className="text-sm text-muted">${maxPrice}</span>
->>>>>>> b11839557a023584904ffae753ac1e71a1ec3a8c
               </div>
             </div>
           </div>
