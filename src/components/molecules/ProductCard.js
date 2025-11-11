@@ -14,7 +14,10 @@ import { RiShoppingBagLine } from "react-icons/ri";
 import { LuEye } from "react-icons/lu";
 import { useToast } from "../ui/ToastProvider";
 import { CURRENCY } from "src/constants";
+<<<<<<< HEAD
 import { FALLBACK_IMG } from "src/data";
+=======
+>>>>>>> b11839557a023584904ffae753ac1e71a1ec3a8c
 
 export default function ProductCard({ id, name, image, price, soldOut }) {
   const dispatch = useDispatch();
@@ -47,7 +50,11 @@ export default function ProductCard({ id, name, image, price, soldOut }) {
         className="relative aspect-square overflow-hidden w-full block"
       >
         <Image
+<<<<<<< HEAD
           src={image || FALLBACK_IMG}
+=======
+          src={image || "/placeholder.png"}
+>>>>>>> b11839557a023584904ffae753ac1e71a1ec3a8c
           alt={name}
           fill
           className={`object-cover group-hover:scale-110  transition-all duration-500 ${

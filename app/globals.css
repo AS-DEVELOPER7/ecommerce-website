@@ -38,7 +38,11 @@
   --surface-base: #f3f4f6;
   --color-primary: #ee2b8c;
   --color-secondary: #a8005d;
+<<<<<<< HEAD
   --color-accent: #f4f0f2;
+=======
+  --color-accent: #ffd1e8;
+>>>>>>> b11839557a023584904ffae753ac1e71a1ec3a8c
   --color-success: #0ea85d;
   --color-warning: #fbbf24;
   --color-danger: #ef4444;
@@ -59,7 +63,11 @@
 }
 
 /* 🌙 DARK THEME */
+<<<<<<< HEAD
 /* [data-theme="dark"] {
+=======
+[data-theme="dark"] {
+>>>>>>> b11839557a023584904ffae753ac1e71a1ec3a8c
   --bg: #0b0f1a;
   --surface: #1f2937;
   --surface-base: #2a3444;
@@ -69,6 +77,7 @@
   --color-success: #34d399;
   --color-warning: #facc15;
   --color-danger: #f87171;
+<<<<<<< HEAD
   --color-info:   #38bdf8;       
    NEW: Soft backgrounds (solid, no opacity) 
   --success-bg: #14532d;   
@@ -76,14 +85,28 @@
   --error-bg:   #7f1d1d;   
   --info-bg:    #0c4a6e;   
   --bg-accent:  #1e3a8a;   
+=======
+  --color-info:   #38bdf8;       /* sky-400 */
+  /* NEW: Soft backgrounds (solid, no opacity) */
+  --success-bg: #14532d;   /* dark green-900 */
+  --warning-bg: #78350f;   /* dark amber-900 */
+  --error-bg:   #7f1d1d;   /* dark red-900 */
+  --info-bg:    #0c4a6e;   /* dark sky-900 */
+  --bg-accent:  #1e3a8a;   /* dark blue-900 */
+>>>>>>> b11839557a023584904ffae753ac1e71a1ec3a8c
 
   --color-base: #f9f6f7;
   --color-muted: #bda6b1;
   --color-border: #523343;
   --input-bg: #2a3444;
   --input-border: #444c5c;
+<<<<<<< HEAD
   --overlay: #ffffff12; 
 } */
+=======
+  --overlay: #ffffff12;
+}
+>>>>>>> b11839557a023584904ffae753ac1e71a1ec3a8c
 
 /* ===============================
    BASE STYLES
@@ -145,7 +168,10 @@
     @apply w-full rounded-lg h-12 px-4 border border-[var(--color-input-border)] bg-[var(--color-input-bg)] placeholder:text-[var(--color-muted)] focus:ring-2 focus:ring-[var(--color-primary)] focus:outline-none;
   }
 
+<<<<<<< HEAD
 
 /* Tabs-specific scrollbar hiding */
 .tabs-scroll-hide::-webkit-scrollbar { display: none; }
 .tabs-scroll-hide { -ms-overflow-style: none; scrollbar-width: none; }
+=======
+>>>>>>> b11839557a023584904ffae753ac1e71a1ec3a8c
