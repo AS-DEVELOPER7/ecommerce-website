@@ -18,18 +18,19 @@ import ProductCard from "src/components/molecules/ProductCard";
 import { products } from "src/data";
 import {
   CATEGORY_KEYS,
-  CATEGORY_LIST,
   DEFAULT_PAGE_SIZE,
   PAGE_SIZE_OPTIONS,
   MATERIAL_LIST,
   STYLE_LIST,
+  MAX_PRICE,
+  CURRENCY,
 } from "src/constants";
 
 export default function ShopPage() {
   const dispatch = useDispatch();
   const { selectedCategory } = useSelector((s) => s.general) || {};
 
-  const categories = [...CATEGORY_LIST];
+  const categories = Object.values(CATEGORY_KEYS);
 
   // UI state
   const [activeCategory, setActiveCategory] = useState(
@@ -44,7 +45,7 @@ export default function ShopPage() {
   const [openFilters, setOpenFilters] = useState(false);
   const [materials, setMaterials] = useState([]); // selected materials
   const [styles, setStyles] = useState([]); // selected styles
-  const [maxPrice, setMaxPrice] = useState(9999);
+  const [maxPrice, setMaxPrice] = useState(MAX_PRICE);
 
   // Derived facets (could be from constants, but here we compute what's present)
   const availableMaterials = useMemo(() => {
@@ -124,7 +125,7 @@ export default function ShopPage() {
   const clearAllFilters = () => {
     setMaterials([]);
     setStyles([]);
-    setMaxPrice(9999);
+    setMaxPrice(MAX_PRICE);
     setSearch("");
     setSortOrder("default");
     setOpenFilters(false);
@@ -152,7 +153,7 @@ export default function ShopPage() {
           />
         </div>
 
-        {/* Sort + Page Size + Filter Toggle */}
+        {/* Sort  + Filter Toggle */}
         <div className="flex items-center gap-3 justify-between sm:justify-end">
           <div className="flex items-center gap-2">
             <label htmlFor="sort" className="text-sm text-muted">
@@ -259,13 +260,15 @@ export default function ShopPage() {
                 <input
                   type="range"
                   min={10}
-                  max={1000}
+                  max={MAX_PRICE}
                   step={5}
-                  value={Math.min(maxPrice, 1000)}
+                  value={Math.min(maxPrice, MAX_PRICE)}
                   onChange={(e) => setMaxPrice(Number(e.target.value))}
                   className="w-full"
                 />
-                <span className="text-sm text-muted">${maxPrice}</span>
+                <span className="text-sm text-muted">
+                  {maxPrice} {CURRENCY}
+                </span>
               </div>
             </div>
           </div>

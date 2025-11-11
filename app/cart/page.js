@@ -17,76 +17,80 @@ import {
   RiShoppingBag3Line,
   RiArrowLeftSLine,
 } from "react-icons/ri";
-
-const FALLBACK_IMG =
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuDTWQnjyq8wk7oC7RxhCK0oqtwz40dsH0HPMWoOhEFnKWEj01SDthaaa84DlblFq861CzdE_CWDsbUTPZCbcbpDkl89Wwm7cMv6C-WIjvNW2wKus_-EBZwAtDKYxLReU9a13CunB8hhBGh82GXBmj3yZR-9jj9Lb_dW5TubEB_2CPvXPMVaULAaHm9AikeEDig2BrG-UH7BtutkEDuoX5Nv7TNrQj9T7OsdHrN54jjYbz_5eKvcZTQ2cQ4ydgCUfNFopTENlAY400H9";
+import { FALLBACK_IMG } from "src/data";
+import { CURRENCY } from "src/constants";
 
 /* Row */
 function CartRow({ item, onInc, onDec, onRemove }) {
+  const subTotal = (Number(item.price) * Number(item.qty)).toFixed(2);
+  const unitPrice = Number(item.price).toFixed(2);
   const primaryImage =
     (Array.isArray(item.images) && item.images[0]) ||
     item.image ||
     FALLBACK_IMG;
 
   return (
-    <div className="grid grid-cols-[80px_1fr_auto] sm:grid-cols-[96px_1fr_auto] gap-4 sm:gap-6 items-center border-b border-border pb-4">
+    <div className="flex items-center justify-between gap-4 sm:gap-6  border-b border-border pb-4">
       {/* Image */}
-      <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-surface">
-        <Image
-          src={primaryImage}
-          alt={item.name}
-          fill
-          className="object-cover"
-        />
-      </div>
+      <div className="flex items-center gap-5">
+        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-surface">
+          <Image
+            src={primaryImage}
+            alt={item.name}
+            fill
+            className="object-cover"
+          />
+        </div>
 
-      {/* Info */}
-      <div className="min-w-0">
-        <p className="font-medium text-black truncate">{item.name}</p>
-        {item.category && <p className="text-muted text-sm">{item.category}</p>}
+        {/* Info */}
+        <div className="min-w-0">
+          <p className="font-medium text-base truncate">{item.name}</p>
+          {item.category && (
+            <p className="text-muted text-sm">{item.category}</p>
+          )}
 
-        <div className="mt-2 flex items-center gap-3">
-          {/* Qty controls */}
-          <div className="inline-flex items-center border border-border rounded-md overflow-hidden">
+          <div className="mt-2 flex items-center gap-3">
+            {/* Qty controls */}
+            <div className="inline-flex items-center border border-border rounded-md overflow-hidden">
+              <button
+                onClick={onDec}
+                className="h-9 w-9 grid place-items-center hover:bg-surface-base"
+                aria-label="Decrease"
+              >
+                <RiSubtractLine />
+              </button>
+              <span className="px-3 text-sm font-semibold select-none">
+                {item.qty}
+              </span>
+              <button
+                onClick={onInc}
+                className="h-9 w-9 grid place-items-center hover:bg-surface-base"
+                aria-label="Increase"
+              >
+                <RiAddLine />
+              </button>
+            </div>
+
             <button
-              onClick={onDec}
-              className="h-9 w-9 grid place-items-center hover:bg-surface-base"
-              aria-label="Decrease"
+              onClick={onRemove}
+              className="inline-flex items-center gap-2 text-sm text-muted hover:text-primary hover:bg-surface-base p-2 rounded-lg"
             >
-              <RiSubtractLine />
-            </button>
-            <span className="px-3 text-sm font-semibold select-none">
-              {item.qty}
-            </span>
-            <button
-              onClick={onInc}
-              className="h-9 w-9 grid place-items-center hover:bg-surface-base"
-              aria-label="Increase"
-            >
-              <RiAddLine />
+              <RiDeleteBin6Line className="text-base" />
+              Remove
             </button>
           </div>
-
-          <button
-            onClick={onRemove}
-            className="inline-flex items-center gap-2 text-sm text-muted hover:text-primary"
-          >
-            <RiDeleteBin6Line className="text-base" />
-            Remove
-          </button>
         </div>
       </div>
-
       {/* Line total */}
       <div className="text-right">
-        <p className="font-semibold text-black">
-          ${(Number(item.price) * Number(item.qty)).toFixed(2)}
+        <p className="font-semibold text-base">
+          {subTotal} {CURRENCY}
         </p>
         <p className="text-xs text-muted">
-          Unit: ${Number(item.price).toFixed(2)}
+          Unit: {unitPrice} {CURRENCY}
         </p>
         {item.soldOut && (
-          <span className="mt-1 inline-block text-xs bg-gray-900 text-white rounded-md px-2 py-0.5">
+          <span className="mt-1 inline-block text-xs bg-secondary text-white rounded-md p-2">
             SOLD OUT
           </span>
         )}
@@ -163,7 +167,7 @@ export default function CartPage() {
               </p>
               <button
                 onClick={clear}
-                className="text-sm text-muted hover:text-primary"
+                className="text-sm text-muted hover:text-primary "
               >
                 Clear cart
               </button>
@@ -212,26 +216,30 @@ export default function CartPage() {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted">Subtotal</span>
-                <span className="font-medium text-black">
-                  ${subtotal.toFixed(2)}
+                <span className="font-medium text-base">
+                  {subtotal.toFixed(2)} {CURRENCY}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted">Shipping</span>
-                <span className="font-medium text-black">
-                  {shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
+                <span className="font-medium text-base">
+                  {shipping === 0 ? "Free" : `${shipping.toFixed(2)}`}{" "}
+                  {CURRENCY}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted">Discount</span>
-                <span className="font-medium text-black">
-                  {discount > 0 ? `-$${discount.toFixed(2)}` : "$0.00"}
+                <span className="font-medium text-base">
+                  {discount > 0 ? `-${discount.toFixed(2)}` : "0.00 "}{" "}
+                  {CURRENCY}
                 </span>
               </div>
               <div className="border-t border-border my-3" />
               <div className="flex justify-between text-base">
                 <span className="font-semibold">Total</span>
-                <span className="font-semibold">${total.toFixed(2)}</span>
+                <span className="font-semibold">
+                  {total.toFixed(2)} {CURRENCY}
+                </span>
               </div>
             </div>
 
@@ -254,7 +262,7 @@ export default function CartPage() {
             <p className="mt-3 text-xs text-muted">
               {subtotal >= 200
                 ? "You’ve unlocked free shipping!"
-                : "Add more items worth $200.00 total to get free shipping."}
+                : `Add more items worth 200.00 ${CURRENCY} total to get free shipping.`}
             </p>
           </aside>
         </div>

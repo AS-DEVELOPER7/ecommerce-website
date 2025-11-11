@@ -61,19 +61,19 @@ export default function ProductDetails({}) {
   };
 
   return (
-    <main className="bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200 min-h-screen">
+    <main className="bg-background-light dark:bg-background-dark text-base  min-h-screen">
       {/* Top bar / breadcrumbs */}
-      <div className="px-4 sm:px-8 lg:px-16 py-6 border-b border-gray-200/70 dark:border-gray-700/50">
+      <div className="px-4 sm:px-8 lg:px-16 py-6 border-b border-border ">
         <div className="max-w-7xl mx-auto flex flex-wrap gap-2 text-sm">
-          <Link href="/" className="text-gray-500 hover:text-primary">
+          <Link href="/" className="text-muted hover:text-primary">
             Home
           </Link>
-          <span className="text-gray-400">/</span>
-          <Link href="/shop" className="text-gray-500 hover:text-primary">
+          <span className="text-muted">/</span>
+          <Link href="/shop" className="text-muted hover:text-primary">
             shop
           </Link>
-          <span className="text-gray-400">/</span>
-          <span className="text-gray-900 dark:text-white">{product.name}</span>
+          <span className="text-muted">/</span>
+          <span className="text-muted ">{product.name}</span>
         </div>
       </div>
 
@@ -82,7 +82,7 @@ export default function ProductDetails({}) {
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
           {/* Gallery */}
           <div className="flex flex-col gap-4">
-            <div className="relative group overflow-hidden rounded-xl aspect-square bg-white/30 dark:bg-white/5">
+            <div className="relative group overflow-hidden rounded-xl aspect-square bg-surface ">
               {mainImg && (
                 <Image
                   src={mainImg}
@@ -130,7 +130,7 @@ export default function ProductDetails({}) {
               {product.materials?.map((m) => (
                 <span
                   key={m}
-                  className="text-xs px-3 py-1 rounded-full border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300"
+                  className="text-xs px-3 py-1 rounded-full border border-border  text-muted "
                 >
                   {m}
                 </span>
@@ -138,13 +138,13 @@ export default function ProductDetails({}) {
               {product.styles?.map((s) => (
                 <span
                   key={s}
-                  className="text-xs px-3 py-1 rounded-full border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300"
+                  className="text-xs px-3 py-1 rounded-full border border-border dark:border-gray-600 text-muted "
                 >
                   {s}
                 </span>
               ))}
               {product.soldOut && (
-                <span className="text-xs px-3 py-1 rounded-full bg-gray-200 dark:bg-white/10 text-gray-600">
+                <span className="text-xs px-3 py-1 rounded-full bg-gray-200 dark:bg-white/10 text-muted">
                   Sold out
                 </span>
               )}
@@ -155,7 +155,7 @@ export default function ProductDetails({}) {
             </div>
 
             {product.description && (
-              <p className="mt-4 text-gray-600 dark:text-gray-300 leading-relaxed">
+              <p className="mt-4 text-muted  leading-relaxed">
                 {product.description}
               </p>
             )}
@@ -166,10 +166,10 @@ export default function ProductDetails({}) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {product.sizes?.length > 0 && (
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label className="text-sm font-medium text-gray-700 ">
                     Size
                   </label>
-                  <select className="rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark/50 focus:border-primary focus:ring-primary/50">
+                  <select className="rounded-lg border-border dark:border-gray-600 bg-white dark:bg-background-dark/50 focus:border-primary focus:ring-primary/50">
                     {product.sizes.map((s) => (
                       <option key={s}>{s}</option>
                     ))}
@@ -178,7 +178,7 @@ export default function ProductDetails({}) {
               )}
 
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="text-sm font-medium text-gray-700 ">
                   Quantity
                 </label>
                 <div className="flex items-center border border-border rounded-xl  flex-1 justify-center overflow-hidden">
@@ -226,7 +226,7 @@ export default function ProductDetails({}) {
               {product.soldOut && (
                 <button
                   disabled
-                  className="flex w-full sm:w-auto flex-1 max-w-[480px] items-center justify-center rounded-xl h-12 bg-gray-300 text-gray-600 font-bold cursor-not-allowed"
+                  className="flex w-full sm:w-auto flex-1 max-w-[480px] items-center justify-center rounded-xl h-12 bg-gray-300 text-muted font-bold cursor-not-allowed"
                 >
                   Sold Out
                 </button>
@@ -244,15 +244,15 @@ export default function ProductDetails({}) {
                   <button className="border-b-2 border-primary pb-3 text-sm font-medium text-primary">
                     Description
                   </button>
-                  {/* <button className="border-b-2 border-transparent pb-3 text-sm text-gray-500 hover:text-gray-700">
+                  {/* <button className="border-b-2 border-transparent pb-3 text-sm text-muted hover:text-gray-700">
                     Reviews
                   </button>
-                  <button className="border-b-2 border-transparent pb-3 text-sm text-gray-500 hover:text-gray-700">
+                  <button className="border-b-2 border-transparent pb-3 text-sm text-muted hover:text-gray-700">
                     Shipping & Returns
                   </button> */}
                 </nav>
               </div>
-              <div className="py-6 text-gray-600 dark:text-gray-300 space-y-3">
+              <div className="py-6 text-muted  space-y-3">
                 <p>
                   Designed for daily elegance, crafted with lasting materials.
                   Pair it with matching pieces in our collection for a refined

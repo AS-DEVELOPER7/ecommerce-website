@@ -1,0 +1,14 @@
+{
+  "id": "Rose Gold Weave Bracelet",
+  "slug": "rose-gold-weave-bracelet",
+  "name": "Rose Gold Weave Bracelet",
+  "category": "CATEGORY_KEYS.BRACELETS",
+  "sizes": ["Small", "Medium", "Large"],
+  "price": 89,
+
+  "featured": true,
+  "soldOut": false,
+  "materials": ["MATERIAL_OPTIONS.GOLD", "MATERIAL_OPTIONS.GEMSTONES"],
+  "styles": ["STYLE_OPTIONS.WOVEN"],
+  "images": ["img(0)", "img(1)", "img(2)"]
+}

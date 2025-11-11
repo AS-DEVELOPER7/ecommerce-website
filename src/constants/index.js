@@ -1,5 +1,6 @@
 // src/constants/index.js
 export const CURRENCY = "INR";
+export const MAX_PRICE = 5000;
 // Category keys (UI-facing names preserved)
 export const CATEGORY_KEYS = {
   ALL: "All",
@@ -9,9 +10,6 @@ export const CATEGORY_KEYS = {
   RINGS: "Rings",
   WATCHES: "Watches",
 };
-
-// Category list used in UIs (order matters)
-export const CATEGORY_LIST = Object.values(CATEGORY_KEYS);
 
 // ---- Materials (single source of truth) ----
 export const MATERIAL_OPTIONS = {
