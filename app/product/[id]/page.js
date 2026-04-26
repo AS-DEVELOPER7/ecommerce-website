@@ -190,17 +190,17 @@ export default function ProductDetails() {
               </p>
             </div>
 
-            <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-8">
-              <div className="bg-surface-base p-8 rounded-2xl">
-                <h4 className="font-semibold uppercase tracking-widest text-xs sm:text-sm mb-4">
-                  Shipping & Returns
-                </h4>
-                <p className="text-xs sm:text-sm text-muted leading-relaxed">
-                  Returns accepted within 30 days of delivery in original
-                  condition via our returns portal and opening video is a must
-                  for any return.
-                </p>
-              </div>
+            <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-1 gap-8">
+              // <div className="bg-surface-base p-8 rounded-2xl">
+              //   <h4 className="font-semibold uppercase tracking-widest text-xs sm:text-sm mb-4">
+              //     Shipping & Returns
+              //   </h4>
+              //   <p className="text-xs sm:text-sm text-muted leading-relaxed">
+              //     Returns accepted within 30 days of delivery in original
+              //     condition via our returns portal and opening video is a must
+              //     for any return.
+              //   </p>
+              // </div>
               <div className="bg-surface-base p-8 rounded-2xl">
                 <h4 className="font-semibold uppercase tracking-widest text-xs sm:text-sm mb-4">
                   Care Guide
