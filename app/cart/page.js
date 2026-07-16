@@ -12,9 +12,9 @@ import { SHIPPING_THRESHOLD, SHIPPING_COST } from "src/constants";
 
 import { RiArrowLeftSLine } from "react-icons/ri";
 
-import CartRow from "src/components/molecules/cart/CartRow";
-import EmptyCart from "src/components/molecules/cart/EmptyCart";
-import CartSummary from "src/components/organisms/cart/CartSummary";
+import CartRow from "src/components/molecules/CartRow";
+import EmptyCart from "src/components/molecules/EmptyCart";
+import CartSummary from "src/components/organisms/CartSummary";
 
 export default function CartPage() {
   const dispatch = useDispatch();

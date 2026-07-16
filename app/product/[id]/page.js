@@ -10,9 +10,9 @@ import {
   useLazySearchProductsQuery,
 } from "src/services/api/productsApi";
 
-import ProductGallery from "src/components/organisms/product/ProductGallery";
-import ProductInfo from "src/components/organisms/product/ProductInfo";
-import RelatedProducts from "src/components/organisms/product/RelatedProducts";
+import ProductGallery from "src/components/organisms/ProductGallery";
+import ProductInfo from "src/components/organisms/ProductInfo";
+import RelatedProducts from "src/components/organisms/RelatedProducts";
 import { CURRENCY } from "src/constants";
 
 export default function ProductDetails() {
@@ -67,38 +67,6 @@ export default function ProductDetails() {
       .slice(0, 4);
   }, [product, relatedProductsData]);
 
-  const finalPrice = useMemo(() => {
-    if (!product) return 0;
-
-    const sizeName = typeof selectedSize === "object" ? selectedSize?.size : selectedSize;
-    const colorLabel = selectedVariant?.selectedColor?.color || selectedVariant?.color || null;
-
-    if (product.price_overrides && product.price_overrides.length > 0) {
-      const exactOverride = product.price_overrides.find((po) => {
-        const oColors = Array.isArray(po.color) ? po.color : (po.color ? [po.color] : []);
-        const sizeMatch = po.size === sizeName;
-        const colorMatch = colorLabel && oColors.includes(colorLabel);
-        return sizeMatch && colorMatch;
-      });
-      if (exactOverride) return exactOverride.price;
-
-      const colorOverride = product.price_overrides.find((po) => {
-        const oColors = Array.isArray(po.color) ? po.color : (po.color ? [po.color] : []);
-        const colorMatch = colorLabel && oColors.includes(colorLabel);
-        return !po.size && colorMatch;
-      });
-      if (colorOverride) return colorOverride.price;
-
-      const sizeOverride = product.price_overrides.find((po) => {
-        const oColors = Array.isArray(po.color) ? po.color : (po.color ? [po.color] : []);
-        return po.size === sizeName && oColors.length === 0;
-      });
-      if (sizeOverride) return sizeOverride.price;
-    }
-
-    return selectedSize?.price ?? product.price;
-  }, [product, selectedSize, selectedVariant]);
-
   if (isLoading || !product) {
     return (
       <main className="bg-bg min-h-screen pt-24 pb-12 px-4 flex justify-center">
@@ -133,6 +101,8 @@ export default function ProductDetails() {
       selectedVariant?.images?.[0] ||
       selectedVariant?.selectedStyle?.images?.[0] ||
       product?.images?.[0];
+
+    const finalPrice = selectedSize?.price ?? product.price;
 
     dispatch(
       addToCart({
@@ -169,15 +139,15 @@ export default function ProductDetails() {
           >
             Home
           </Link>
-          <span className="text-muted/40">/</span>
+          <span className="text-border">/</span>
           <Link
             href="/shop"
             className="text-muted hover:text-primary transition-colors"
           >
             Shop
           </Link>
-          <span className="text-muted/40">/</span>
-          <span className="text-primary truncate max-w-[200px] sm:max-w-none">
+          <span className="text-border">/</span>
+          <span className="text-base truncate max-w-[200px] sm:max-w-md">
             {product.title}
           </span>
         </div>
@@ -198,7 +168,6 @@ export default function ProductDetails() {
             onSelectVariant={setSelectedVariant}
             selectedSize={selectedSize}
             onSelectSize={setSelectedSize}
-            price={finalPrice}
             qty={qty}
             setQty={setQty}
             itemInCart={itemInCart}
@@ -221,17 +190,8 @@ export default function ProductDetails() {
               </p>
             </div>
 
-            <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-8">
-              <div className="bg-surface-base p-8 rounded-2xl">
-                <h4 className="font-semibold uppercase tracking-widest text-xs sm:text-sm mb-4">
-                  Shipping & Returns
-                </h4>
-                <p className="text-xs sm:text-sm text-muted leading-relaxed">
-                  Returns accepted within 30 days of delivery in original
-                  condition via our returns portal and opening video is a must
-                  for any return.
-                </p>
-              </div>
+            <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-1 gap-8">
+              
               <div className="bg-surface-base p-8 rounded-2xl">
                 <h4 className="font-semibold uppercase tracking-widest text-xs sm:text-sm mb-4">
                   Care Guide

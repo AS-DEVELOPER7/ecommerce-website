@@ -22,7 +22,7 @@ export default function Input({
         onChange={onChange}
         placeholder={placeholder}
         className={clsx(
-          "w-full rounded-xl h-12 border border-neutral-300 bg-white shadow-sm text-base placeholder:text-muted focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none hover:border-neutral-400 transition duration-300",
+          "w-full rounded-xl h-12 border border-input-border bg-input-bg text-base placeholder:text-muted focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none transition",
           Icon ? "pl-12 pr-4" : "px-4",
           className
         )}

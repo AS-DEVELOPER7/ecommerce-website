@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import ContactInfo from "src/components/organisms/contact/ContactInfo";
-import ContactLocation from "src/components/organisms/contact/ContactLocation";
-import ContactForm from "src/components/organisms/contact/ContactForm";
+import ContactInfo from "src/components/organisms/ContactInfo";
+import ContactLocation from "src/components/organisms/ContactLocation";
+import ContactForm from "src/components/organisms/ContactForm";
 
 export default function ContactPage() {
   return (

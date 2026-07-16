@@ -1,10 +1,10 @@
 "use client";
 
-import HeroSection from "src/components/organisms/home/HeroSection";
-import FeaturedProducts from "src/components/organisms/home/FeaturedProducts";
-import ExploreCollection from "src/components/organisms/home/ExploreCollection";
-import OurStory from "src/components/organisms/home/OurStory";
-import NewsLetter from "src/components/organisms/home/NewsLetter";
+import HeroSection from "src/components/organisms/HeroSection";
+import FeaturedProducts from "src/components/organisms/FeaturedProducts";
+import ExploreCollection from "src/components/organisms/ExploreCollection";
+import OurStory from "src/components/organisms/OurStory";
+import NewsLetter from "src/components/organisms/NewsLetter";
 
 export default function HomePage() {
   return (

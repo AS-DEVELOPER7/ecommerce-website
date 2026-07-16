@@ -3,10 +3,9 @@ import { supabase } from "src/services/reducers/supabaseClient";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  if (!supabase)
-    return Response.json({ error: "Supabase not configured" }, { status: 500 });
+  if (!supabase) return Response.json({ error: "Supabase not configured" }, { status: 500 });
   const { data, error } = await supabase
-    .from("products_view")
+    .from("products")
     .select("*")
     .eq("is_featured", true)
     .order("created_at", { ascending: false });
