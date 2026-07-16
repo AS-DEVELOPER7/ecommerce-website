@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart, removeFromCart } from "src/services/reducers/cartReducer";
+import { addToCart, removeFromCart, updateQuantity } from "src/services/reducers/cartReducer";
 import { useParams } from "next/navigation";
 import {
   useLazyGetProductByIdQuery,
@@ -67,6 +67,25 @@ export default function ProductDetails() {
       .slice(0, 4);
   }, [product, relatedProductsData]);
 
+  const currentSizeLabel =
+    typeof selectedSize === "object" ? selectedSize?.size : selectedSize;
+  const itemInCart = cart.find(
+    (i) =>
+      product &&
+      i.id === product.id &&
+      i.style === (selectedVariant?.style || null) &&
+      i.color ===
+        (selectedVariant?.selectedColor?.color ||
+          selectedVariant?.color ||
+          null) &&
+      i.size === (currentSizeLabel || null),
+  );
+
+  // Reset local qty state to 1 when selected variant or size changes
+  useEffect(() => {
+    setQty(1);
+  }, [selectedVariant, selectedSize]);
+
   if (isLoading || !product) {
     return (
       <main className="bg-bg min-h-screen pt-24 pb-12 px-4 flex justify-center">
@@ -82,18 +101,14 @@ export default function ProductDetails() {
     );
   }
 
-  const currentSizeLabel =
-    typeof selectedSize === "object" ? selectedSize?.size : selectedSize;
-  const itemInCart = cart.find(
-    (i) =>
-      i.id === product.id &&
-      i.style === (selectedVariant?.style || null) &&
-      i.color ===
-        (selectedVariant?.selectedColor?.color ||
-          selectedVariant?.color ||
-          null) &&
-      i.size === (currentSizeLabel || null),
-  );
+  const handleQtyChange = (val) => {
+    if (itemInCart) {
+      const next = typeof val === "function" ? val(itemInCart.qty) : val;
+      dispatch(updateQuantity({ cartId: itemInCart.cartId, qty: next }));
+    } else {
+      setQty(val);
+    }
+  };
 
   const handleAdd = () => {
     const mainImg =
@@ -168,8 +183,8 @@ export default function ProductDetails() {
             onSelectVariant={setSelectedVariant}
             selectedSize={selectedSize}
             onSelectSize={setSelectedSize}
-            qty={qty}
-            setQty={setQty}
+            qty={itemInCart ? itemInCart.qty : qty}
+            setQty={handleQtyChange}
             itemInCart={itemInCart}
             onAdd={handleAdd}
             onRemove={handleRemove}

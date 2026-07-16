@@ -91,6 +91,7 @@ export const productsApi = createApi({
 
     getCategories: builder.query({
       query: () => "/categories",
+      providesTags: ["Lookups"],
     }),
 
     // Lookups endpoints

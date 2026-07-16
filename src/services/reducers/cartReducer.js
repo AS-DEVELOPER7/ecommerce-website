@@ -30,7 +30,10 @@ const cartReducer = createSlice({
       const item = action.payload;
       const existing = state.items.find(
         (i) =>
-          i.id === item.id && i.color === item.color && i.size === item.size,
+          i.id === item.id &&
+          i.color === item.color &&
+          i.size === item.size &&
+          i.style === item.style,
       );
       if (existing) {
         existing.qty += item.qty || 1;

@@ -3,11 +3,37 @@
 import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { setCategory } from "src/services/reducers/generalReducer";
-import { CATEGORY_LIST } from "src/constants/categories";
 import { motion } from "framer-motion";
+import { useGetCategoriesQuery } from "src/services/api/productsApi";
 
 export default function ExploreCollection() {
   const dispatch = useDispatch();
+  const { data: categories = [], isLoading } = useGetCategoriesQuery();
+
+  if (isLoading) {
+    return (
+      <section className="py-10 sm:py-20 bg-surface-base/50">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex flex-col items-center sm:flex-row sm:justify-between sm:items-end mb-8 gap-6">
+            <div className="flex flex-col items-center sm:items-start space-y-2">
+              <div className="h-4 w-28 bg-neutral-200 animate-pulse rounded" />
+              <div className="h-10 w-64 bg-neutral-200 animate-pulse rounded" />
+            </div>
+            <div className="h-4 w-32 bg-neutral-200 animate-pulse rounded" />
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={i}
+                className="rounded-2xl bg-neutral-200 animate-pulse aspect-[4/5] w-full"
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-10 sm:py-20 bg-surface-base/50">
@@ -30,13 +56,13 @@ export default function ExploreCollection() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-6">
-          {CATEGORY_LIST.map((c, i) => (
+          {categories.map((c, i) => (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.6 }}
-              key={c.name}
+              transition={{ delay: i * 0.05, duration: 0.5 }}
+              key={c.id}
             >
               <Link
                 href="/shop"
@@ -45,7 +71,7 @@ export default function ExploreCollection() {
               >
                 <div
                   className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110"
-                  style={{ backgroundImage: `url(${c.img})` }}
+                  style={{ backgroundImage: `url(${c.image_url})` }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
                 <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
