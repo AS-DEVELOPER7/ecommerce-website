@@ -11,22 +11,22 @@
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-surface-base: var(--surface-base);
-  --color-primary: var(--color-primary);
-  --color-secondary: var(--color-secondary);
-  --color-accent: var(--color-accent);
-  --color-success: var(--color-success);
-  --color-warning: var(--color-warning);
-  --color-danger: var(--color-danger);
-  --color-info: var(--color-info);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
   /* Soft backgrounds for states + accent */
   --color-success-bg: var(--success-bg);
   --color-warning-bg: var(--warning-bg);
   --color-error-bg: var(--error-bg);
   --color-info-bg: var(--info-bg);
   --color-bg-accent: var(--bg-accent);
-  --color-base: var(--color-base);
-  --color-muted: var(--color-muted);
-  --color-border: var(--color-border);
+  --color-base: var(--base);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
   --color-input-bg: var(--input-bg);
   --color-input-border: var(--input-border);
   --color-overlay: var(--overlay);
@@ -58,15 +58,15 @@
   /* Warm off-white */
   --surface: #FFFFFF;
   --surface-base: #F5F3EF;
-  --color-primary: #ee2b8c;
+  --primary: #ee2b8c;
   /* Original Brand Pink */
-  --color-secondary: #a8005d;
+  --secondary: #a8005d;
   /* Original Brand Dark Pink */
-  --color-accent: #EFEBE4;
-  --color-success: #2B7A4B;
-  --color-warning: #D9A05B;
-  --color-danger: #A33A3A;
-  --color-info: #3A6EA5;
+  --accent: #EFEBE4;
+  --success: #2B7A4B;
+  --warning: #D9A05B;
+  --danger: #A33A3A;
+  --info: #3A6EA5;
 
   --success-bg: #E8F4EC;
   --warning-bg: #FDF4E7;
@@ -74,11 +74,11 @@
   --info-bg: #E8F1F8;
   --bg-accent: #F4EFE6;
 
-  --color-base: #1A1A1A;
+  --base: #1A1A1A;
   /* Deep Charcoal Text */
-  --color-muted: #737373;
+  --muted: #737373;
   /* Refined Gray */
-  --color-border: #EAE6DF;
+  --border: #EAE6DF;
   --input-bg: #FFFFFF;
   --input-border: #D8D4CC;
   --overlay: rgba(0, 0, 0, 0.4);

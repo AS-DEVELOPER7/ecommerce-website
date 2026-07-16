@@ -50,6 +50,11 @@ export default function AdminProductsList() {
     const query = searchQuery.toLowerCase().trim();
     let filtered = products;
 
+    console.log("Filtered Products Run - Selected Category:", selectedCategory, "Selected Material:", selectedMaterial);
+    if (products.length > 0) {
+      console.log("Sample product categories:", products[0].categories, "materials:", products[0].materials);
+    }
+
     if (query) {
       filtered = filtered.filter(
         (p) =>

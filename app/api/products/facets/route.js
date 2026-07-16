@@ -6,7 +6,7 @@ export async function GET() {
   if (!supabase) return Response.json({ error: "Supabase not configured" }, { status: 500 });
   try {
     const { data: products, error } = await supabase
-      .from("products")
+      .from("products_view")
       .select("categories, materials, price");
 
     if (error) throw error;

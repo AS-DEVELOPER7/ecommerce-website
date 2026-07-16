@@ -119,7 +119,7 @@ export default function FilterSidebar({
         <Button
           onClick={applyFilters}
           variant="primary"
-          className="px-4 sm:px-8 text-sm sm:text-base rounded-lg shadow-primary/30"
+          className="px-4 sm:px-8 text-sm sm:text-base rounded-lg shadow-primary/30 !text-white"
         >
           Apply Filters
         </Button>
