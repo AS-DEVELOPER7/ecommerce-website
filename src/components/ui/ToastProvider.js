@@ -43,7 +43,7 @@ export function ToastProvider({
       }
       return id;
     },
-    [defaultDuration, maxToasts, remove]
+    [defaultDuration, maxToasts, remove],
   );
 
   const api = useMemo(() => ({ show, remove }), [show, remove]);
@@ -51,7 +51,7 @@ export function ToastProvider({
   return (
     <ToastCtx.Provider value={api}>
       {children}
-      <div className="fixed z-9999 top-4 left-[30%] flex flex-col gap-2 w-[94vw] max-w-sm">
+      <div className="fixed z-9999 top-4 flex flex-col items-center gap-2 px-10 w-full max-w-sm">
         {toasts.map((t) => (
           <ToastItem key={t.id} toast={t} onClose={() => remove(t.id)} />
         ))}
@@ -71,18 +71,18 @@ function ToastItem({ toast, onClose }) {
     toast.type === "success"
       ? "bg-success-bg"
       : toast.type === "error"
-      ? "bg-warning-bg"
-      : "bg-info-bg";
+        ? "bg-warning-bg"
+        : "bg-info-bg";
 
   return (
-    <div className={`rounded-lg shadow-lg text-base ${color} p-3`}>
+    <div className={`rounded-lg shadow-lg w-full text-base ${color} p-3`}>
       <div className="flex items-start gap-3">
         <div className="pt-0.5">
           {toast.type === "success"
             ? "✅"
             : toast.type === "error"
-            ? "⚠️"
-            : "ℹ️"}
+              ? "⚠️"
+              : "ℹ️"}
         </div>
         <div className="flex-1">
           {toast.title && (

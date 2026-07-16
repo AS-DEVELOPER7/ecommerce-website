@@ -1,382 +1,220 @@
-// app/shop/page.js
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  RiSearchLine,
   RiFilter3Line,
   RiArrowLeftSLine,
   RiArrowRightSLine,
-  RiCloseLine,
 } from "react-icons/ri";
 
-import { addToCart } from "src/services/reducers/cartReducer";
-import { setCategory } from "src/services/reducers/generalReducer";
-
-import ProductCard from "src/components/molecules/ProductCard";
-import { products } from "src/data";
+import SearchBar from "src/components/molecules/shop/SearchBar";
+import FilterSidebar from "src/components/organisms/shop/FilterSidebar";
+import ProductGrid from "src/components/organisms/shop/ProductGrid";
+import Pagination from "src/components/molecules/shop/Pagination";
+import ActiveFilters from "src/components/molecules/shop/ActiveFilters";
+import Button from "src/components/atoms/Button";
 import {
-  CATEGORY_KEYS,
-  DEFAULT_PAGE_SIZE,
-  PAGE_SIZE_OPTIONS,
-  MATERIAL_LIST,
-  STYLE_LIST,
-  MAX_PRICE,
-  CURRENCY,
-} from "src/constants";
+  useLazyGetFacetsQuery,
+  useLazySearchProductsQuery,
+} from "src/services/api/productsApi";
 
 export default function ShopPage() {
-  const dispatch = useDispatch();
   const { selectedCategory } = useSelector((s) => s.general) || {};
 
-  const categories = Object.values(CATEGORY_KEYS);
-
-  // UI state
-  const [activeCategory, setActiveCategory] = useState(
-    selectedCategory || CATEGORY_KEYS.ALL
-  );
   const [search, setSearch] = useState("");
-  const [sortOrder, setSortOrder] = useState("default");
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-
-  // Filters (materials & styles)
+  const [pageSize, setPageSize] = useState(12);
   const [openFilters, setOpenFilters] = useState(false);
-  const [materials, setMaterials] = useState([]); // selected materials
-  const [styles, setStyles] = useState([]); // selected styles
-  const [maxPrice, setMaxPrice] = useState(MAX_PRICE);
+  const [sortOrder, setSortOrder] = useState("default");
 
-  // Derived facets (could be from constants, but here we compute what's present)
-  const availableMaterials = useMemo(() => {
-    const set = new Set();
-    products.forEach((p) => p.materials?.forEach((m) => set.add(m)));
-    // keep only those that are in our MATERIAL_LIST (safety)
-    return MATERIAL_LIST.filter((m) => set.has(m));
-  }, []);
-
-  const availableStyles = useMemo(() => {
-    const set = new Set();
-    products.forEach((p) => p.styles?.forEach((st) => set.add(st)));
-    return STYLE_LIST.filter((st) => set.has(st));
-  }, []);
-
-  // Filtering & sorting
-  const filteredProducts = useMemo(() => {
-    let list = [...products];
-
-    // Category
-    if (activeCategory && activeCategory !== CATEGORY_KEYS.ALL) {
-      list = list.filter((p) => p.category === activeCategory);
-    }
-
-    // Search
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      list = list.filter((p) => p.name.toLowerCase().includes(q));
-    }
-
-    // Materials
-    if (materials.length > 0) {
-      list = list.filter((p) =>
-        p.materials?.some((m) => materials.includes(m))
-      );
-    }
-
-    // Styles
-    if (styles.length > 0) {
-      list = list.filter((p) => p.styles?.some((st) => styles.includes(st)));
-    }
-
-    // Price
-    list = list.filter((p) => (p.price ?? 0) <= maxPrice);
-
-    // Sorting
-    if (sortOrder === "lowToHigh") list.sort((a, b) => a.price - b.price);
-    else if (sortOrder === "highToLow") list.sort((a, b) => b.price - a.price);
-
-    return list;
-  }, [activeCategory, search, materials, styles, maxPrice, sortOrder]);
-
-  // Reset to page 1 on filter changes
-  useEffect(() => {
-    setPage(1);
-  }, [
-    activeCategory,
-    search,
-    materials,
-    styles,
-    maxPrice,
-    sortOrder,
-    pageSize,
-  ]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / pageSize));
-  const currentPageItems = filteredProducts.slice(
-    (page - 1) * pageSize,
-    (page - 1) * pageSize + pageSize
+  // Local filter state (inside modal)
+  const [filterCategory, setFilterCategory] = useState(
+    selectedCategory || "All",
   );
+  const [filterMaterials, setFilterMaterials] = useState([]);
+  const [filterStyles, setFilterStyles] = useState([]);
+  const [filterSizes, setFilterSizes] = useState([]);
+  const [filterColors, setFilterColors] = useState([]);
+  const [filterMaxPrice, setFilterMaxPrice] = useState(10000);
 
-  const toggleArrayValue = (arr, value, setter) => {
-    if (arr.includes(value)) setter(arr.filter((v) => v !== value));
-    else setter([...arr, value]);
-  };
+  // Applied filters for API
+  const [appliedFilters, setAppliedFilters] = useState({
+    category: selectedCategory || "All",
+    materials: [],
+    styles: [],
+    sizes: [],
+    colors: [],
+    maxPrice: 10000,
+  });
 
-  const clearAllFilters = () => {
-    setMaterials([]);
-    setStyles([]);
-    setMaxPrice(MAX_PRICE);
-    setSearch("");
-    setSortOrder("default");
+  const [getFacets, { data: facets }] = useLazyGetFacetsQuery();
+
+  useEffect(() => {
+    getFacets();
+  }, [getFacets]);
+
+  useEffect(() => {
+    if (facets?.maxPrice && !appliedFilters.maxPrice) {
+      setFilterMaxPrice(facets.maxPrice);
+    }
+  }, [facets, appliedFilters.maxPrice]);
+
+  const queryParams = useMemo(() => {
+    const params = { page, limit: pageSize };
+    if (appliedFilters.category && appliedFilters.category !== "All")
+      params.category = appliedFilters.category;
+    if (appliedFilters.materials?.length > 0)
+      params.materials = JSON.stringify(appliedFilters.materials);
+    if (appliedFilters.styles?.length > 0)
+      params.styles = JSON.stringify(appliedFilters.styles);
+    if (appliedFilters.sizes?.length > 0)
+      params.sizes = JSON.stringify(appliedFilters.sizes);
+    if (appliedFilters.colors?.length > 0)
+      params.colors = JSON.stringify(appliedFilters.colors);
+    if (appliedFilters.maxPrice && appliedFilters.maxPrice < 10000)
+      params.maxPrice = appliedFilters.maxPrice;
+    if (search.trim()) params.search = search.trim();
+    if (sortOrder !== "default") params.sort = sortOrder;
+    return params;
+  }, [appliedFilters, page, pageSize, search, sortOrder]);
+
+  const [searchProducts, { data, isLoading, isFetching }] =
+    useLazySearchProductsQuery();
+
+  useEffect(() => {
+    searchProducts(queryParams);
+  }, [queryParams, searchProducts]);
+
+  const productsData = data || { data: [], pagination: {} };
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil((productsData?.pagination?.total || 0) / pageSize),
+  );
+  const applyFilters = () => {
+    setAppliedFilters({
+      category: filterCategory,
+      materials: filterMaterials,
+      styles: filterStyles,
+      sizes: filterSizes,
+      colors: filterColors,
+      maxPrice: filterMaxPrice,
+    });
+    setPage(1);
     setOpenFilters(false);
-    setActiveCategory(CATEGORY_KEYS.ALL);
-    dispatch(setCategory(CATEGORY_KEYS.ALL));
   };
+
+  const clearFilters = () => {
+    setFilterCategory("All");
+    setFilterMaterials([]);
+    setFilterStyles([]);
+    setFilterSizes([]);
+    setFilterColors([]);
+    setFilterMaxPrice(facets?.maxPrice || 10000);
+    setAppliedFilters({
+      category: "All",
+      materials: [],
+      styles: [],
+      sizes: [],
+      colors: [],
+      maxPrice: facets?.maxPrice || 10000,
+    });
+    setPage(1);
+    setOpenFilters(false);
+  };
+
+  const handleSearch = useCallback((val) => {
+    setSearch(val);
+    setPage(1);
+  }, []);
 
   return (
-    <main className="min-h-screen bg-bg text-base px-4 sm:px-8 py-12">
-      <h1 className="text-4xl font-serif font-bold text-center mb-8">
-        Shop All Collections
-      </h1>
+    <main className="min-h-screen bg-bg text-base px-4 sm:px-8 py-10 sm:py-16">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-2xl sm:text-3xl font-serif font-medium text-center mb-8">
+          Shop Collections
+        </h1>
 
-      {/* SEARCH + SORT + PAGE SIZE + OPEN FILTERS */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
-        {/* Search */}
-        <div className="relative w-full sm:w-[40%]">
-          <RiSearchLine className="absolute left-3 top-3 text-muted text-lg" />
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-surface text-base focus:ring-2 focus:ring-primary focus:outline-none"
-          />
-        </div>
-
-        {/* Sort  + Filter Toggle */}
-        <div className="flex items-center gap-3 justify-between sm:justify-end">
-          <div className="flex items-center gap-2">
-            <label htmlFor="sort" className="text-sm text-muted">
-              Sort:
-            </label>
-            <select
-              id="sort"
-              className="rounded-md border border-border bg-surface py-2 px-3 text-sm focus:ring-2 focus:ring-primary"
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-            >
-              <option value="default">Default</option>
-              <option value="lowToHigh">Price: Low → High</option>
-              <option value="highToLow">Price: High → Low</option>
-            </select>
-          </div>
-          <button
-            onClick={() => setOpenFilters((v) => !v)}
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-border bg-surface hover:bg-surface-base"
-          >
-            <RiFilter3Line /> Filters
-          </button>
-        </div>
-      </div>
-
-      {/* CATEGORY CHIPS */}
-      <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => {
-              setActiveCategory(cat);
-              dispatch(setCategory(cat));
-            }}
-            className={`px-3 sm:px-4 py-2 rounded-full border text-sm font-semibold transition ${
-              activeCategory === cat
-                ? "bg-primary text-white border-primary"
-                : "border-border text-muted hover:border-primary hover:text-primary"
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      {/* FILTER DRAWER (simple, responsive) */}
-      {openFilters && (
-        <div className="mb-8 rounded-xl border border-border shadow-md p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold">Filter Products</h3>
-            <button
-              onClick={() => setOpenFilters(false)}
-              className="text-muted hover:text-primary"
-            >
-              <RiCloseLine className="text-xl" />
-            </button>
-          </div>
-
-          <div className="flex flex-col gap-4">
-            {/* Materials */}
-            <div>
-              <p className="text-sm font-semibold mb-2">Materials</p>
-              <div className="flex flex-wrap gap-2">
-                {availableMaterials.map((m) => (
-                  <button
-                    key={m}
-                    onClick={() => toggleArrayValue(materials, m, setMaterials)}
-                    className={`px-3 py-1 rounded-full text-sm border transition ${
-                      materials.includes(m)
-                        ? "bg-primary text-white border-primary"
-                        : "border-border text-muted hover:border-primary hover:text-primary"
-                    }`}
-                  >
-                    {m}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Styles */}
-            <div>
-              <p className="text-sm font-semibold mb-2">Styles</p>
-              <div className="flex flex-wrap gap-2">
-                {availableStyles.map((st) => (
-                  <button
-                    key={st}
-                    onClick={() => toggleArrayValue(styles, st, setStyles)}
-                    className={`px-3 py-1 rounded-full text-sm border transition ${
-                      styles.includes(st)
-                        ? "bg-primary text-white border-primary"
-                        : "border-border text-muted hover:border-primary hover:text-primary"
-                    }`}
-                  >
-                    {st}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Max Price */}
-            <div>
-              <p className="text-sm font-semibold mb-2">Max Price</p>
-              <div className="flex items-center gap-3">
-                <input
-                  type="range"
-                  min={10}
-                  max={MAX_PRICE}
-                  step={5}
-                  value={Math.min(maxPrice, MAX_PRICE)}
-                  onChange={(e) => setMaxPrice(Number(e.target.value))}
-                  className="w-full"
-                />
-                <span className="text-sm text-muted">
-                  {maxPrice} {CURRENCY}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 flex items-center justify-between">
-            <button
-              onClick={clearAllFilters}
-              className="text-sm px-3 py-2 rounded-md border border-border hover:border-primary hover:text-primary"
-            >
-              Clear all
-            </button>
-            {/* <button
-              onClick={() => setOpenFilters(false)}
-              className="px-4 py-2 rounded-md bg-primary text-white font-semibold"
-            >
-              Apply
-            </button> */}
-          </div>
-        </div>
-      )}
-
-      {/* PRODUCT GRID */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
-        {currentPageItems.length > 0 ? (
-          currentPageItems.map((p) => (
-            <ProductCard
-              key={p.id}
-              id={p.id}
-              slug={p.slug}
-              name={p.name}
-              image={p.images?.[0]} // pick first image
-              price={p.price}
-              soldOut={p.soldOut}
-              onAddToCart={() => dispatch(addToCart(p))}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between mb-8">
+          <div className="w-full sm:max-w-md">
+            <SearchBar
+              initialValue={search}
+              onSearch={handleSearch}
+              placeholder="Search by name, style, or material..."
             />
-          ))
-        ) : (
-          <p className="text-center mt-[10vh] text-muted col-span-full">
-            No products found.
-          </p>
-        )}
-      </div>
+          </div>
 
-      {/* PAGINATION */}
-      {filteredProducts.length > 0 && (
-        <div className="mt-10 flex items-center justify-center gap-2">
-          <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            className="px-3 py-2 rounded-md border border-border bg-surface hover:bg-surface-base disabled:opacity-50"
-            disabled={page === 1}
-          >
-            <RiArrowLeftSLine className="text-lg" />
-          </button>
-          {Array.from({ length: totalPages }).map((_, i) => {
-            const pg = i + 1;
-            if (pg === 1 || pg === totalPages || Math.abs(pg - page) <= 1) {
-              return (
-                <button
-                  key={pg}
-                  onClick={() => setPage(pg)}
-                  className={`px-3 py-2 rounded-md border text-sm ${
-                    pg === page
-                      ? "bg-primary text-white border-primary"
-                      : "border-border bg-surface hover:bg-surface-base text-muted"
-                  }`}
-                >
-                  {pg}
-                </button>
-              );
-            }
-            if (
-              (pg === page - 2 && pg > 1) ||
-              (pg === page + 2 && pg < totalPages)
-            ) {
-              return (
-                <span key={`dots-${pg}`} className="px-2">
-                  …
-                </span>
-              );
-            }
-            return null;
-          })}
-          <button
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            className="px-3 py-2 rounded-md border border-border bg-surface hover:bg-surface-base disabled:opacity-50"
-            disabled={page === totalPages}
-          >
-            <RiArrowRightSLine className="text-lg" />
-          </button>{" "}
-          <div className="flex items-center gap-2">
-            <label htmlFor="pagesize" className="text-sm text-muted">
-              Per page:
-            </label>
-            <select
-              id="pagesize"
-              className="rounded-md border w-20 border-border bg-surface py-2 px-3 text-sm focus:ring-2 focus:ring-primary"
-              value={pageSize}
-              onChange={(e) => setPageSize(Number(e.target.value))}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 justify-between sm:justify-end w-full sm:w-auto">
+            <div className="flex items-center gap-2">
+              <label htmlFor="sort" className="text-xs text-neutral-500 font-semibold uppercase tracking-wider">
+                Sort:
+              </label>
+              <select
+                id="sort"
+                className="rounded-xl border border-neutral-300 w-full sm:w-auto bg-white shadow-sm py-2 px-4 text-sm text-neutral-800 focus:ring-2 focus:ring-primary focus:outline-none hover:border-neutral-400 transition duration-300 cursor-pointer"
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value)}
+              >
+                <option value="default">Default</option>
+                <option value="lowToHigh">Price: Low → High</option>
+                <option value="highToLow">Price: High → Low</option>
+              </select>
+            </div>
+
+            <button
+              onClick={() => setOpenFilters((v) => !v)}
+              className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-neutral-800 rounded-xl border border-neutral-300 bg-white hover:border-primary hover:text-primary transition duration-300 relative shadow-sm hover:shadow"
             >
-              {PAGE_SIZE_OPTIONS.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
+              <RiFilter3Line className="text-xl" /> Filters
+              {(appliedFilters.category && appliedFilters.category !== "All") ||
+              appliedFilters.materials?.length ||
+              appliedFilters.styles?.length ||
+              appliedFilters.sizes?.length ||
+              appliedFilters.colors?.length ? (
+                <span className="w-2.5 h-2.5 rounded-full bg-primary border border-white shadow-sm absolute -top-1 -right-1" />
+              ) : null}
+            </button>
           </div>
         </div>
-      )}
+
+        <FilterSidebar
+          openFilters={openFilters}
+          setOpenFilters={setOpenFilters}
+          facets={facets}
+          filterCategory={filterCategory}
+          setFilterCategory={setFilterCategory}
+          filterMaterials={filterMaterials}
+          setFilterMaterials={setFilterMaterials}
+          filterStyles={filterStyles}
+          setFilterStyles={setFilterStyles}
+          filterSizes={filterSizes}
+          setFilterSizes={setFilterSizes}
+          filterColors={filterColors}
+          setFilterColors={setFilterColors}
+          filterMaxPrice={filterMaxPrice}
+          setFilterMaxPrice={setFilterMaxPrice}
+          applyFilters={applyFilters}
+          clearFilters={clearFilters}
+        />
+
+        <ActiveFilters appliedFilters={appliedFilters} />
+
+        <ProductGrid
+          isLoading={isLoading || isFetching}
+          products={productsData?.data}
+        />
+
+        {/* PAGINATION */}
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          setPage={(p) => {
+            setPage(p);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        />
+      </div>
     </main>
   );
 }

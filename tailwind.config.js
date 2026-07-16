@@ -7,7 +7,8 @@ module.exports = {
       colors: {},
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui"],
-        heading: ["Poppins", "ui-sans-serif", "system-ui"],
+        serif: ["Playfair Display", "ui-serif", "Georgia", "serif"],
+        display: ["Inter", "ui-sans-serif", "system-ui"],
       },
       boxShadow: {
         soft: "0 4px 10px rgba(0,0,0,.06)",

@@ -1,142 +1,89 @@
-<<<<<<< HEAD
-# 🏢 Al Nada HR Management System (HRMS)
+# 💎 Tarmal Creation – Handcrafted Jewelry
 
-A **modern Human Resource Management System** for **Al Nada Int’l Exchange Co.**, built with **Next.js (App Router + JavaScript)** in frontend.  
-It supports **Arabic & English**, **Kuwait (GMT + 3)** timezone, and provides **role-based access**, **payroll**, **leave**, **attendance**, and **approval workflows**.
+A **premium, modern e-commerce platform** showcasing exquisite handcrafted jewelry designs. Built with **Next.js 16 (App Router)** and **Tailwind CSS 4**, this store focuses on high-end aesthetics, interactive product displays, and secure backend integration.
 
 ---
 
 ## ✨ Features
 
-### 🔐 Auth & RBAC
-- Email / Password authentication or optional SSO.  
-- Roles: **Admin**, **HR**, **Manager**, **Employee**.  
-- Role-based access control across all modules.
+### 💍 Premium Browsing
+- **Interactive Product Gallery**: Smooth mouse-tracked 2x magnifying glass zoom for inspecting fine jewelry details.
+- **Atomic Design Architecture**: Highly modular and reusable component system (Atoms, Molecules, Organisms).
+- **Responsive & Dynamic**: Fully optimized for mobile screens with adaptive aspect ratios and layouts.
 
-### 👥 Core HR
-- Complete employee information management.  
-- Employee contracts, documents, dependents, IDs, and bank accounts.
+### 🔐 Security & Backend
+- **Server-Side Supabase Integration**: All database operations are proxied through secure API routes, keeping Supabase keys hidden from the browser.
+- **Dynamic Content**: Category and product management powered by a Supabase backend.
+- **Secure Environment Variables**: Migrated to server-only keys for production hardening.
 
-### 🧾 Audit & Logs
-- Every sensitive action tracked with detailed logs.
-
-### 🌍 Localization
-- Full **Arabic / English** support (**RTL / LTR**).  
-- Optional Hijri date display and Kuwait numeral formatting.
-
-### ✉️ Emails & Notifications
-- SMTP-based email alerts (Microsoft 365 supported).  
-- In-app toasts and optional WhatsApp / SMS integrations.
+### 🛒 Checkout Flow
+- **WhatsApp Order Integration**: Direct communication with the shop via detailed WhatsApp order templates.
+- **Smart Variations**: Full support for product colors and sizes as unique line items.
+- **Robust Image System**: Intelligent `ImageWithFallback` component that gracefully handles missing product photos with a professional brand icon.
 
 ---
 
 ## 🧱 Tech Stack
 
-| Layer                         | Technologies                                                  |
-|-------------------------------|---------------------------------------------------------------|
-| **Frontend / SSR**            | Next.js (App Router), React 18, JavaScript, Tailwind CSS      |
-| **State Management**          | Redux                                                         |
-| **Authentication**            | NextAuth (Credentials or OAuth2 provider optional)            |
-| **Backend**                   | Spring Boot (Java 17 +) REST API                              |
-| **Database**                  | PostgreSQL 17 + (default) or SQL Server 2019                  |
-| **File Storage**              | S3-compatible (MinIO / AWS) or local `/uploads` folder        |
-| **Email**                     | SMTP (e.g., Microsoft 365 / Exchange Online)                  |
-| **Testing**                   | Vitest + Testing Library + Playwright (e2e)                   |
-| **CI / CD**                   | GitHub Actions pipelines                                      |
-| **Package Manager**           | pnpm (latest LTS)                                             |
+| Layer                | Technologies                                      |
+| -------------------- | ------------------------------------------------- |
+| **Framework**        | Next.js 16 (App Router), React 19                 |
+| **Styling**          | Tailwind CSS 4, Framer Motion                     |
+| **State & API**      | Redux Toolkit, RTK Query                          |
+| **Backend**          | Supabase JS (Server-Side)                         |
+| **Localization**     | i18next, React i18next                            |
+| **Icons**            | React Icons (Lucide, HeroIcons, Remix)            |
+| **Package Manager**  | pnpm                                              |
 
 ---
 
-## 🕒 Timezone & Locale
-All timestamps normalized to **Asia/Kuwait (GMT + 3)**.  
-Localized UI follows user language and RTL/LTR direction automatically.
-
----
-
-## 📄 License
-Internal proprietary software — © **Al Nada Exchange**  
-All rights reserved. Redistribution or commercial use without authorization is prohibited.
-
----
-
-## 📬 Contact
-For technical support or deployment assistance, contact:  
-**TechnicalSupport@alnadaex.com**
-=======
-# Ecommerce Website
-
-A modern ecommerce website built using **Next.js** and **Tailwind CSS**.
-
-## Features
-
-- ⚡ **Fast and Responsive**: Built with Next.js for performance and scalability.
-- 🎨 **Styled with Tailwind CSS**: Rapidly build and customize your UI.
-- 🛒 **Ecommerce Functionality**: Product listings, cart, and checkout flow.
-- 🚀 **SEO Friendly**: Optimized for search engines with Next.js.
-- 📱 **Mobile Ready**: Responsive design for all devices.
-
-## Tech Stack
-
-- **Next.js** (React-based Framework)
-- **Tailwind CSS** (Utility-first CSS framework)
-- **JavaScript** (Main programming language)
-- **CSS** (For additional styling needs)
-
-## Getting Started
+## 🚀 Getting Started
 
 1. **Clone the repository**
-
    ```bash
    git clone https://github.com/AS-DEVELOPER7/ecommerce-website.git
    cd ecommerce-website
    ```
 
-2. **Install dependencies**
-
-   ```bash
-   npm install
-   # or
-   yarn install
+2. **Environment Setup**
+   Create a `.env` file in the root directory:
+   ```env
+   SUPABASE_URL=your_supabase_url
+   SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
 
-3. **Run the development server**
-
+3. **Install Dependencies**
    ```bash
-   npm run dev
-   # or
-   yarn dev
+   pnpm install
    ```
 
-4. **Open your browser**
+4. **Run Development Server**
+   ```bash
+   pnpm dev
+   ```
 
-   Visit [http://localhost:3000](http://localhost:3000) to view the app.
-
-## Project Structure
-
-```
-├── components     # Reusable UI components
-├── pages          # Next.js pages
-├── public         # Static assets
-├── styles         # Tailwind and custom CSS
-├── utils          # Utility functions (if any)
-├── package.json
-└── README.md
-```
-
-## Customization
-
-- Update `tailwind.config.js` to customize Tailwind settings.
-- Add or modify components and pages to fit your ecommerce needs.
-
-## Contributing
-
-Contributions are welcome! Please open issues or submit pull requests for improvements or bug fixes.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
+5. **Visit** [http://localhost:3000](http://localhost:3000)
 
 ---
 
-> **ecommerce website using next.js and tailwindcss**
->>>>>>> b11839557a023584904ffae753ac1e71a1ec3a8c
+## 📂 Project Structure
+
+```
+├── app/               # Next.js 16 App Router (Pages & API)
+├── public/            # Static assets (icon.svg, images)
+├── src/
+│   ├── components/    # Atomic Design (Atoms, Molecules, Organisms, Layouts)
+│   ├── constants/     # Global constants and configuration
+│   ├── services/      # Redux store, slices, and API definitions
+│   ├── styles/        # Global CSS and Tailwind directives
+│   └── utils/         # Helper functions (currency, formatting)
+├── next.config.mjs    # Next.js configuration
+└── tailwind.config.js # Tailwind CSS configuration
+```
+
+---
+
+## 📄 License
+
+Internal proprietary software — © **Tarmal Creation**  
+All rights reserved. Redistribution or commercial use without authorization is prohibited.

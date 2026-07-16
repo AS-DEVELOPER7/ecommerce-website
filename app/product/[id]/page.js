@@ -1,300 +1,252 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  addToCart,
-  updateQuantity,
-  removeFromCart,
-} from "src/services/reducers/cartReducer";
-import { products } from "src/data";
-import { CATEGORY_KEYS } from "src/constants";
-import { HiOutlineMinus, HiOutlinePlus, HiOutlineTrash } from "react-icons/hi2";
-import { RiShoppingBagLine } from "react-icons/ri";
+import { addToCart, removeFromCart } from "src/services/reducers/cartReducer";
 import { useParams } from "next/navigation";
+import {
+  useLazyGetProductByIdQuery,
+  useLazySearchProductsQuery,
+} from "src/services/api/productsApi";
 
-export default function ProductDetails({}) {
+import ProductGallery from "src/components/organisms/product/ProductGallery";
+import ProductInfo from "src/components/organisms/product/ProductInfo";
+import RelatedProducts from "src/components/organisms/product/RelatedProducts";
+import { CURRENCY } from "src/constants";
+
+export default function ProductDetails() {
   const dispatch = useDispatch();
   const { id } = useParams();
-  const product = products?.find((item) => item?.id === id);
   const cart = useSelector((s) => s.cart.items || []);
-  const itemInCart = cart.find((i) => i.id === product.id);
 
-  const [activeIdx, setActiveIdx] = useState(0);
-  const mainImg = product.images?.[activeIdx] || product.images?.[0];
+  const [getProductById, { data: product, isLoading }] =
+    useLazyGetProductByIdQuery();
 
+  useEffect(() => {
+    if (id) getProductById(id);
+  }, [id, getProductById]);
+
+  const variants = product?.variants ? [...product.variants] : [];
+  const enhancedProduct = { ...product, variants };
+
+  const defaultVariant = enhancedProduct?.variants?.[0] || null;
+  const defaultSize = product?.sizes?.[0] || null;
+  const [selectedVariant, setSelectedVariant] = useState(defaultVariant);
+  const [selectedSize, setSelectedSize] = useState(defaultSize);
   const [qty, setQty] = useState(1);
 
+  useEffect(() => {
+    const defaultV = product?.variants?.[0] || null;
+    if (defaultV && defaultV.style && defaultV.colors?.length) {
+      setSelectedVariant({
+        ...defaultV,
+        selectedStyle: defaultV,
+        selectedColor: defaultV.colors[0],
+      });
+    } else {
+      setSelectedVariant(defaultV);
+    }
+    setSelectedSize(defaultSize);
+    setQty(1);
+  }, [product?.id, defaultSize]);
+
+  const [searchProducts, { data: relatedProductsData }] =
+    useLazySearchProductsQuery();
+
+  useEffect(() => {
+    if (product?.categories?.[0]) {
+      searchProducts({ category: product.categories[0] });
+    }
+  }, [product, searchProducts]);
+
   const related = useMemo(() => {
-    return products
-      .filter((p) => p.category === product.category && p.id !== product.id)
-      .slice(0, 8);
-  }, [product.id, product.category]);
-  const add = () =>
+    if (!product || !relatedProductsData) return [];
+    return (relatedProductsData.data || [])
+      .filter((p) => p.id !== product.id)
+      .slice(0, 4);
+  }, [product, relatedProductsData]);
+
+  const finalPrice = useMemo(() => {
+    if (!product) return 0;
+
+    const sizeName = typeof selectedSize === "object" ? selectedSize?.size : selectedSize;
+    const colorLabel = selectedVariant?.selectedColor?.color || selectedVariant?.color || null;
+
+    if (product.price_overrides && product.price_overrides.length > 0) {
+      const exactOverride = product.price_overrides.find((po) => {
+        const oColors = Array.isArray(po.color) ? po.color : (po.color ? [po.color] : []);
+        const sizeMatch = po.size === sizeName;
+        const colorMatch = colorLabel && oColors.includes(colorLabel);
+        return sizeMatch && colorMatch;
+      });
+      if (exactOverride) return exactOverride.price;
+
+      const colorOverride = product.price_overrides.find((po) => {
+        const oColors = Array.isArray(po.color) ? po.color : (po.color ? [po.color] : []);
+        const colorMatch = colorLabel && oColors.includes(colorLabel);
+        return !po.size && colorMatch;
+      });
+      if (colorOverride) return colorOverride.price;
+
+      const sizeOverride = product.price_overrides.find((po) => {
+        const oColors = Array.isArray(po.color) ? po.color : (po.color ? [po.color] : []);
+        return po.size === sizeName && oColors.length === 0;
+      });
+      if (sizeOverride) return sizeOverride.price;
+    }
+
+    return selectedSize?.price ?? product.price;
+  }, [product, selectedSize, selectedVariant]);
+
+  if (isLoading || !product) {
+    return (
+      <main className="bg-bg min-h-screen pt-24 pb-12 px-4 flex justify-center">
+        <div className="animate-pulse w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-16">
+          <div className="aspect-4/5 bg-surface-base rounded-2xl w-full"></div>
+          <div className="space-y-6 pt-10">
+            <div className="h-10 bg-surface-base rounded-lg w-3/4"></div>
+            <div className="h-6 bg-surface-base rounded-lg w-1/4"></div>
+            <div className="h-32 bg-surface-base rounded-lg w-full mt-10"></div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  const currentSizeLabel =
+    typeof selectedSize === "object" ? selectedSize?.size : selectedSize;
+  const itemInCart = cart.find(
+    (i) =>
+      i.id === product.id &&
+      i.style === (selectedVariant?.style || null) &&
+      i.color ===
+        (selectedVariant?.selectedColor?.color ||
+          selectedVariant?.color ||
+          null) &&
+      i.size === (currentSizeLabel || null),
+  );
+
+  const handleAdd = () => {
+    const mainImg =
+      selectedVariant?.selectedColor?.images?.[0] ||
+      selectedVariant?.images?.[0] ||
+      selectedVariant?.selectedStyle?.images?.[0] ||
+      product?.images?.[0];
+
     dispatch(
       addToCart({
         id: product.id,
-        name: product.name,
+        name: product.title,
+        style: selectedVariant?.style || null,
+        color:
+          selectedVariant?.selectedColor?.color ||
+          selectedVariant?.color ||
+          null,
+        size: currentSizeLabel || null,
         image: mainImg,
-        price: product.price,
-        soldOut: product.soldOut,
+        price: finalPrice,
+        soldOut: product.sold_out,
         qty,
-      })
+      }),
     );
-
-  const inc = () => setQty((q) => Math.min(99, q + 1));
-  const dec = () => setQty((q) => Math.max(1, q - 1));
-
-  const decCart = () => {
-    if (!itemInCart) return;
-    const newQty = itemInCart.qty - 1;
-    if (newQty <= 0) dispatch(removeFromCart(itemInCart.cartId));
-    else dispatch(updateQuantity({ cartId: itemInCart.cartId, qty: newQty }));
   };
-  const incCart = () => {
-    if (!itemInCart) return;
-    dispatch(
-      updateQuantity({ cartId: itemInCart.cartId, qty: itemInCart.qty + 1 })
-    );
+
+  const handleRemove = () => {
+    if (itemInCart) {
+      dispatch(removeFromCart(itemInCart.cartId));
+    }
   };
 
   return (
-    <main className="bg-background-light dark:bg-background-dark text-base  min-h-screen">
-      {/* Top bar / breadcrumbs */}
-      <div className="px-4 sm:px-8 lg:px-16 py-6 border-b border-border ">
-        <div className="max-w-7xl mx-auto flex flex-wrap gap-2 text-sm">
-          <Link href="/" className="text-muted hover:text-primary">
+    <main className="bg-bg text-base min-h-screen">
+      {/* Breadcrumbs */}
+      <div className="px-4 sm:px-8 lg:px-16 py-8">
+        <div className="max-w-7xl mx-auto flex flex-wrap gap-2 text-sm font-medium tracking-wide">
+          <Link
+            href="/"
+            className="text-muted hover:text-primary transition-colors"
+          >
             Home
           </Link>
-          <span className="text-muted">/</span>
-          <Link href="/shop" className="text-muted hover:text-primary">
-            shop
+          <span className="text-muted/40">/</span>
+          <Link
+            href="/shop"
+            className="text-muted hover:text-primary transition-colors"
+          >
+            Shop
           </Link>
-          <span className="text-muted">/</span>
-          <span className="text-muted ">{product.name}</span>
+          <span className="text-muted/40">/</span>
+          <span className="text-primary truncate max-w-[200px] sm:max-w-none">
+            {product.title}
+          </span>
         </div>
       </div>
 
-      {/* Main content */}
-      <div className="px-4 sm:px-8 lg:px-16 py-10">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-          {/* Gallery */}
-          <div className="flex flex-col gap-4">
-            <div className="relative group overflow-hidden rounded-xl aspect-square bg-surface ">
-              {mainImg && (
-                <Image
-                  src={mainImg}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  priority
-                />
-              )}
-              <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 rounded-xl" />
-            </div>
+      {/* Main Content */}
+      <div className="px-4 sm:px-8 lg:px-16 pb-16">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+          <ProductGallery
+            product={enhancedProduct}
+            selectedVariant={selectedVariant}
+            onSelectVariant={setSelectedVariant}
+          />
 
-            {/* Thumbnails */}
-            {product.images?.length > 1 && (
-              <div className="grid grid-cols-4 gap-3">
-                {product.images.map((src, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveIdx(i)}
-                    className={`relative aspect-square rounded-lg overflow-hidden border-2 transition ${
-                      i === activeIdx
-                        ? "border-primary"
-                        : "border-transparent hover:border-primary/60"
-                    }`}
-                    aria-label={`Thumbnail ${i + 1}`}
-                  >
-                    <Image
-                      src={src}
-                      alt={`${product.name} ${i + 1}`}
-                      fill
-                      className="object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          <ProductInfo
+            product={enhancedProduct}
+            selectedVariant={selectedVariant}
+            onSelectVariant={setSelectedVariant}
+            selectedSize={selectedSize}
+            onSelectSize={setSelectedSize}
+            price={finalPrice}
+            qty={qty}
+            setQty={setQty}
+            itemInCart={itemInCart}
+            onAdd={handleAdd}
+            onRemove={handleRemove}
+          />
+        </div>
 
-          {/* Info / Actions */}
-          <div className="flex flex-col pt-2">
-            <h1 className="text-3xl sm:text-4xl font-bold">{product.name}</h1>
-
-            <div className="mt-3 flex flex-wrap gap-2">
-              {product.materials?.map((m) => (
-                <span
-                  key={m}
-                  className="text-xs px-3 py-1 rounded-full border border-border  text-muted "
-                >
-                  {m}
-                </span>
-              ))}
-              {product.styles?.map((s) => (
-                <span
-                  key={s}
-                  className="text-xs px-3 py-1 rounded-full border border-border dark:border-gray-600 text-muted "
-                >
-                  {s}
-                </span>
-              ))}
-              {product.soldOut && (
-                <span className="text-xs px-3 py-1 rounded-full bg-gray-200 dark:bg-white/10 text-muted">
-                  Sold out
-                </span>
-              )}
-            </div>
-
-            <div className="text-3xl font-bold mt-5">
-              ${product.price?.toFixed(2)}
-            </div>
-
-            {product.description && (
-              <p className="mt-4 text-muted  leading-relaxed">
-                {product.description}
+        {/* Description / Extra Details Section */}
+        <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-border">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="md:col-span-1 border-b border-border md:border-none pb-4 md:pb-0">
+              <h3 className="font-serif text-xl sm:text-2xl font-medium mb-4">
+                The Details
+              </h3>
+              <p className="text-sm sm:text-base text-muted leading-relaxed font-light">
+                Designed for daily elegance, crafted with lasting materials.
+                Pair it with matching pieces in our collection for a refined
+                set.
               </p>
-            )}
-
-            <div className="w-full h-px bg-gray-200 dark:bg-gray-700/50 my-8" />
-
-            {/* Size (placeholder) + Quantity */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {product.sizes?.length > 0 && (
-                <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-gray-700 ">
-                    Size
-                  </label>
-                  <select className="rounded-lg border-border dark:border-gray-600 bg-white dark:bg-background-dark/50 focus:border-primary focus:ring-primary/50">
-                    {product.sizes.map((s) => (
-                      <option key={s}>{s}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-gray-700 ">
-                  Quantity
-                </label>
-                <div className="flex items-center border border-border rounded-xl  flex-1 justify-center overflow-hidden">
-                  <button
-                    onClick={dec}
-                    className="flex-1 p-3 flex justify-center text-lg font-bold items-center text-primary hover:bg-primary hover:text-white transition w-10"
-                  >
-                    <HiOutlineMinus />
-                  </button>
-                  <span className="flex-1 text-center mx-3 text-lg font-semibold">
-                    {qty}
-                  </span>
-                  <button
-                    onClick={inc}
-                    className="flex-1 p-3 flex justify-center text-lg font-bold items-center text-primary hover:bg-primary hover:text-white transition w-10"
-                  >
-                    <HiOutlinePlus />
-                  </button>
-                </div>
-              </div>
             </div>
 
-            {/* Primary actions */}
-            <div className="flex flex-col sm:flex-row gap-4 mt-8">
-              {!product.soldOut && !itemInCart && (
-                <button
-                  onClick={add}
-                  className="flex w-full sm:w-auto flex-1 max-w-[480px] items-center justify-center rounded-xl h-12 bg-primary text-white gap-2 font-bold px-6 hover:bg-primary/90"
-                >
-                  <RiShoppingBagLine />
-                  Add to Cart
-                </button>
-              )}
-
-              {!product.soldOut && itemInCart && (
-                <button
-                  onClick={() => dispatch(removeFromCart(itemInCart.cartId))}
-                  className="flex w-full sm:w-auto flex-1 max-w-[480px] items-center justify-center rounded-xl h-12 bg-surface text-primary gap-2 font-bold px-6 "
-                >
-                  <HiOutlineTrash />
-                  Remove
-                </button>
-              )}
-
-              {product.soldOut && (
-                <button
-                  disabled
-                  className="flex w-full sm:w-auto flex-1 max-w-[480px] items-center justify-center rounded-xl h-12 bg-gray-300 text-muted font-bold cursor-not-allowed"
-                >
-                  Sold Out
-                </button>
-              )}
-
-              {/* <button className="flex items-center justify-center rounded-xl h-12 bg-primary/20 text-primary font-bold px-4 w-12 hover:bg-primary/30">
-               ♥
-              </button> */}
-            </div>
-
-            {/* Tabs (static content placeholders) */}
-            <div className="mt-10">
-              <div className="border-b border-gray-200 dark:border-gray-700/50">
-                <nav className="-mb-px flex gap-6">
-                  <button className="border-b-2 border-primary pb-3 text-sm font-medium text-primary">
-                    Description
-                  </button>
-                  {/* <button className="border-b-2 border-transparent pb-3 text-sm text-muted hover:text-gray-700">
-                    Reviews
-                  </button>
-                  <button className="border-b-2 border-transparent pb-3 text-sm text-muted hover:text-gray-700">
-                    Shipping & Returns
-                  </button> */}
-                </nav>
+            <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-8">
+              <div className="bg-surface-base p-8 rounded-2xl">
+                <h4 className="font-semibold uppercase tracking-widest text-xs sm:text-sm mb-4">
+                  Shipping & Returns
+                </h4>
+                <p className="text-xs sm:text-sm text-muted leading-relaxed">
+                  Returns accepted within 30 days of delivery in original
+                  condition via our returns portal and opening video is a must
+                  for any return.
+                </p>
               </div>
-              <div className="py-6 text-muted  space-y-3">
-                <p>
-                  Designed for daily elegance, crafted with lasting materials.
-                  Pair it with matching pieces in our collection for a refined
-                  set.
+              <div className="bg-surface-base p-8 rounded-2xl">
+                <h4 className="font-semibold uppercase tracking-widest text-xs sm:text-sm mb-4">
+                  Care Guide
+                </h4>
+                <p className="text-xs sm:text-sm text-muted leading-relaxed">
+                  Gently wipe with a soft cloth after wear to retain its
+                  brilliant shine. Store in the provided pouch in a cool, dry
+                  place. Avoid contact with perfumes and lotions.
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Related */}
-        {related.length > 0 && (
-          <section className="max-w-7xl mx-auto mt-16">
-            <h3 className="text-2xl font-bold mb-6">You Might Also Like</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {related.map((p) => (
-                <Link
-                  key={p.id}
-                  href={`/product/${p.id}`}
-                  className="group block"
-                >
-                  <div className="relative overflow-hidden rounded-xl aspect-square">
-                    <Image
-                      src={p.images?.[0] || p.image}
-                      alt={p.name}
-                      fill
-                      className="object-cover transition-transform group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="py-3">
-                    <h4 className="font-semibold group-hover:text-primary transition-colors">
-                      {p.name}
-                    </h4>
-                    <p className="text-muted mt-0.5 font-medium">
-                      ${p.price.toFixed(2)}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
+        <RelatedProducts related={related} />
       </div>
     </main>
   );

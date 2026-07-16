@@ -1,4 +1,5 @@
 import { createSlice, nanoid } from "@reduxjs/toolkit";
+import { SHIPPING_THRESHOLD, SHIPPING_COST } from "src/constants";
 
 const cartReducer = createSlice({
   name: "cart",
@@ -13,7 +14,7 @@ const cartReducer = createSlice({
       country: "",
     },
     payment: {
-      method: "cash",
+      method: "whatsapp",
       cardNumber: "",
       expiry: "",
       cvc: "",
@@ -27,7 +28,10 @@ const cartReducer = createSlice({
   reducers: {
     addToCart: (state, action) => {
       const item = action.payload;
-      const existing = state.items.find((i) => i.id === item.id);
+      const existing = state.items.find(
+        (i) =>
+          i.id === item.id && i.color === item.color && i.size === item.size,
+      );
       if (existing) {
         existing.qty += item.qty || 1;
       } else {
@@ -57,7 +61,7 @@ const cartReducer = createSlice({
     },
     recalculateTotals: (state) => {
       const subtotal = state.items.reduce((sum, i) => sum + i.price * i.qty, 0);
-      const shipping = subtotal > 100 ? 0 : 5;
+      const shipping = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
       const total = subtotal + shipping;
       state.orderSummary = { subtotal, shipping, total };
     },
