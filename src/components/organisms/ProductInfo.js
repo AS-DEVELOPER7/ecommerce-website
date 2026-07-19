@@ -1,12 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { useToast } from "../ui/ToastProvider";
 import Button from "../atoms/Button";
 import QuantitySelector from "../molecules/QuantitySelector";
-import { RiShoppingBagLine } from "react-icons/ri";
+import { RiShoppingBagLine, RiWhatsappLine } from "react-icons/ri";
 import { HiOutlineTrash } from "react-icons/hi2";
 import { motion } from "framer-motion";
 import { CURRENCY } from "src/constants";
+import ProductShareModal from "./product/ProductShareModal";
 
 export default function ProductInfo({
   product,
@@ -21,6 +23,7 @@ export default function ProductInfo({
   onRemove,
 }) {
   const { show } = useToast();
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const handleAdd = () => {
     onAdd();
@@ -196,48 +199,68 @@ export default function ProductInfo({
       <div className="w-full h-px bg-border my-8" />
 
       {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-6 ">
-        <div className="w-full sm:w-[140px] shrink-0">
-          <label className="text-xs sm:text-sm font-semibold uppercase tracking-widest text-muted mb-3 block">
-            Quantity
-          </label>
-          <QuantitySelector
-            quantity={qty}
-            onIncrement={() => setQty((q) => Math.min(99, q + 1))}
-            onDecrement={() => setQty((q) => Math.max(1, q - 1))}
-            className="h-10 sm:h-14"
-          />
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row gap-6">
+          <div className="w-full sm:w-[140px] shrink-0">
+            <label className="text-xs sm:text-sm font-semibold uppercase tracking-widest text-muted mb-3 block">
+              Quantity
+            </label>
+            <QuantitySelector
+              quantity={qty}
+              onIncrement={() => setQty((q) => Math.min(99, q + 1))}
+              onDecrement={() => setQty((q) => Math.max(1, q - 1))}
+              className="h-10 sm:h-14"
+            />
+          </div>
+
+          <div className="flex-1 flex items-end">
+            {product.sold_out ? (
+              <Button
+                disabled
+                className="w-full h-10 sm:h-14 bg-surface-base text-muted shadow-none"
+              >
+                Sold Out
+              </Button>
+            ) : itemInCart ? (
+              <Button
+                onClick={onRemove}
+                variant="outline"
+                className="w-full h-10 sm:h-14 gap-2 text-danger hover:text-danger hover:border-danger hover:bg-danger/5"
+              >
+                <HiOutlineTrash className="text-lg sm:text-xl" />
+                Remove from Cart
+              </Button>
+            ) : (
+              <Button
+                onClick={handleAdd}
+                variant="primary"
+                className="w-full h-10 sm:h-14 gap-2 shadow-primary/30 text-md sm:text-lg"
+              >
+                <RiShoppingBagLine className="text-lg sm:text-xl" />
+                Add to Cart
+              </Button>
+            )}
+          </div>
         </div>
 
-        <div className="flex-1 flex items-end">
-          {product.sold_out ? (
-            <Button
-              disabled
-              className="w-full h-10 sm:h-14 bg-surface-base text-muted shadow-none"
-            >
-              Sold Out
-            </Button>
-          ) : itemInCart ? (
-            <Button
-              onClick={onRemove}
-              variant="outline"
-              className="w-full h-10 sm:h-14 gap-2 text-danger hover:text-danger hover:border-danger hover:bg-danger/5"
-            >
-              <HiOutlineTrash className="text-lg sm:text-xl" />
-              Remove from Cart
-            </Button>
-          ) : (
-            <Button
-              onClick={handleAdd}
-              variant="primary"
-              className="w-full h-10 sm:h-14 gap-2 shadow-primary/30 text-md sm:text-lg"
-            >
-              <RiShoppingBagLine className="text-lg sm:text-xl" />
-              Add to Cart
-            </Button>
-          )}
-        </div>
+        <button
+          type="button"
+          onClick={() => setIsShareModalOpen(true)}
+          className="w-full h-12 sm:h-14 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-medium text-sm sm:text-base flex items-center justify-center gap-3 transition-all duration-300 shadow-md shadow-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/30 cursor-pointer"
+        >
+          <RiWhatsappLine className="text-xl sm:text-2xl" />
+          <span>Share Product Details with Shopkeeper</span>
+        </button>
       </div>
+
+      <ProductShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        product={product}
+        selectedVariant={selectedVariant}
+        selectedSize={selectedSize}
+        price={selectedSize?.price ?? product.price}
+      />
     </div>
   );
 }
