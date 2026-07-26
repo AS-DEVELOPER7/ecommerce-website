@@ -88,11 +88,12 @@ export default function AdminEditProduct({ params }) {
       const rawVars = product.rawVariants || [];
       rawVars.forEach((rv) => {
         const matchingCard = uiVariants.find((uv) => {
+          const sameName = (uv.name || "") === (rv.name || "");
           const sameColors = JSON.stringify(uv.colorIds) === JSON.stringify(rv.colorIds);
           const samePrice = uv.price === rv.price;
           const sameStock = uv.stock === rv.stock;
           const sameImages = JSON.stringify(uv.images) === JSON.stringify(rv.images);
-          return sameColors && samePrice && sameStock && sameImages;
+          return sameName && sameColors && samePrice && sameStock && sameImages;
         });
         if (matchingCard) {
           if (rv.size_id) matchingCard.sizeIds.push(rv.size_id);
@@ -100,6 +101,7 @@ export default function AdminEditProduct({ params }) {
         } else {
           uiVariants.push({
             dbIds: rv.id ? [rv.id] : [],
+            name: rv.name || "",
             sizeIds: rv.size_id ? [rv.size_id] : [],
             colorIds: rv.colorIds || [],
             stock: rv.stock || 0,
@@ -124,6 +126,8 @@ export default function AdminEditProduct({ params }) {
     setVariants([
       ...variants,
       {
+        dbIds: [],
+        name: "",
         size_id: null,
         size_name: "Free Size",
         colorIds: [],
@@ -297,6 +301,7 @@ export default function AdminEditProduct({ params }) {
               const existingId = dbIdsList[index] || null;
               apiVars.push({
                 id: existingId,
+                name: v.name || "",
                 size_id: szId,
                 stock: Number(v.stock),
                 price: v.price !== null && v.price !== "" ? Number(v.price) : null,
@@ -308,6 +313,7 @@ export default function AdminEditProduct({ params }) {
             const existingId = dbIdsList[0] || null;
             apiVars.push({
               id: existingId,
+              name: v.name || "",
               size_id: null,
               stock: Number(v.stock),
               price: v.price !== null && v.price !== "" ? Number(v.price) : null,

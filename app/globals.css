@@ -99,6 +99,20 @@ body {
   color: var(--color-base);
 }
 
+/* Ensure cursor pointer on all interactive elements */
+button,
+a,
+select,
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+input[type="checkbox"],
+input[type="radio"],
+[role="button"],
+.btn {
+  cursor: pointer;
+}
+
 
 /* ===============================
    COMPONENTS
@@ -199,3 +213,113 @@ body {
 .animate-blob-reverse {
   animation: float-blob 25s infinite alternate-reverse ease-in-out;
 }
+
+/* ===============================
+   3D PERSPECTIVE & LUXURY GLOW UTILITIES
+   =============================== */
+
+.perspective-1000 {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.translate-z-10 {
+  transform: translateZ(10px);
+}
+
+.translate-z-20 {
+  transform: translateZ(20px);
+}
+
+.translate-z-30 {
+  transform: translateZ(30px);
+}
+
+.translate-z-40 {
+  transform: translateZ(40px);
+}
+
+.translate-z-50 {
+  transform: translateZ(50px);
+}
+
+/* Metallic Gold & Ruby Shimmer Effect */
+@keyframes holographic-glare {
+  0% {
+    background-position: -200% -200%;
+  }
+  100% {
+    background-position: 200% 200%;
+  }
+}
+
+.glare-overlay {
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 30%,
+    rgba(255, 215, 0, 0.15) 45%,
+    rgba(238, 43, 140, 0.2) 50%,
+    rgba(255, 255, 255, 0.25) 55%,
+    transparent 100%
+  );
+  background-size: 200% 200%;
+  animation: holographic-glare 6s ease-in-out infinite alternate;
+}
+
+/* 3D Glass Card Borders & Soft Glow */
+.glass-card-3d {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 
+    0 20px 40px -15px rgba(0, 0, 0, 0.07),
+    0 0 25px rgba(238, 43, 140, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.dark .glass-card-3d {
+  background: rgba(20, 20, 25, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 20px 40px -15px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(238, 43, 140, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Golden Ambient Pulse Glow */
+@keyframes pulse-gold-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 15px rgba(238, 43, 140, 0.3)) drop-shadow(0 0 35px rgba(212, 175, 55, 0.2));
+  }
+  50% {
+    filter: drop-shadow(0 0 25px rgba(238, 43, 140, 0.6)) drop-shadow(0 0 50px rgba(212, 175, 55, 0.4));
+  }
+}
+
+.gold-glow-pulse {
+  animation: pulse-gold-glow 4s ease-in-out infinite;
+}
+
+/* 3D Floating Geometry Rotation Keyframe */
+@keyframes spin-3d-slow {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+  }
+  100% {
+    transform: rotateX(360deg) rotateY(360deg) rotateZ(180deg);
+  }
+}
+
+.animate-spin-3d {
+  animation: spin-3d-slow 25s linear infinite;
+}

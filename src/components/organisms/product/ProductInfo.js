@@ -26,27 +26,46 @@ export default function ProductInfo({
   const { show } = useToast();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
+  const rawPrice =
+    selectedVariant?.price ?? selectedSize?.price ?? price ?? product.price;
+  const parsedPrice = Number(rawPrice);
+  const displayPrice =
+    !isNaN(parsedPrice) && rawPrice !== null && rawPrice !== undefined
+      ? parsedPrice.toFixed(2)
+      : "";
+
+  // Active sizes available for current selected variant or product
+  const availableSizes =
+    selectedVariant?.sizes?.length > 0
+      ? selectedVariant.sizes
+      : selectedVariant?.size_name
+        ? [selectedVariant.size_name]
+        : product?.sizes || [];
+
   const handleAdd = () => {
     onAdd();
+    const variantDesc =
+      selectedVariant?.name || selectedVariant?.color || selectedVariant?.style;
     show({
       type: "success",
       title: "Added to cart",
-      description: product.title,
+      description: `${product.title}${variantDesc ? ` - ${variantDesc}` : ""}`,
     });
   };
+
   return (
     <div className="flex flex-col py-2 w-full lg:pl-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="space-y-5 mb-5"
+        className="space-y-4 mb-5"
       >
-        <h1 className="text-3xl sm:text-4xl font-serif font-medium leading-tight  text-base">
+        <h1 className="text-3xl sm:text-4xl font-serif font-medium leading-tight text-neutral-900">
           {product.title}
         </h1>
-        <div className="text-xl font-display font-medium text-primary ">
-          {(price ?? selectedSize?.price ?? product.price)?.toFixed(2)} {CURRENCY}
+        <div className="text-2xl font-display font-semibold text-primary">
+          {displayPrice ? `${displayPrice} ${CURRENCY}` : CURRENCY}
         </div>
       </motion.div>
 
@@ -56,146 +75,128 @@ export default function ProductInfo({
           {product.materials?.map((m) => (
             <span
               key={m}
-              className="text-xs font-medium uppercase tracking-widest px-4 py-1.5 rounded-full bg-surface-base text-muted border border-border"
+              className="text-xs font-medium uppercase tracking-widest px-4 py-1.5 rounded-full bg-surface-base text-neutral-600 border border-border"
             >
               {m}
             </span>
           ))}
         </div>
       )}
+
       {/* Description */}
       {product.description && (
-        <p className="text-muted text-sm leading-relaxed mb-5 font-light">
+        <p className="text-neutral-600 text-sm leading-relaxed mb-6 font-normal">
           {product.description}
         </p>
       )}
 
-      {/* Styles Selection */}
-      {product.variants?.some((v) => v.style) && (
+      {/* Collection Variants Selection with Preview Image, Title, Color & Sizes */}
+      {product.variants?.length > 0 && (
         <div className="mb-6">
-          <label className="text-xs sm:text-sm font-bold uppercase tracking-widest text-neutral-500 mb-3 block">
-            Select Style
-          </label>
-          <div className="flex flex-wrap gap-3">
-            {product.variants.map((v, idx) => (
-              <button
-                key={v.style || idx}
-                onClick={() => onSelectVariant({ ...v, selectedStyle: v })}
-                className={`px-5 py-2 rounded-full border text-xs sm:text-sm font-semibold transition-all duration-300 cursor-pointer ${
-                  selectedVariant?.style === v.style
-                    ? "border-primary bg-primary text-white shadow-md shadow-primary/25"
-                    : "border-neutral-300 bg-white/70 text-neutral-700 hover:border-primary hover:text-primary hover:bg-white shadow-sm hover:shadow"
-                }`}
-              >
-                {v.style}
-              </button>
-            ))}
+          <div className="flex items-center justify-between mb-3">
+            <label className="text-xs sm:text-sm font-bold uppercase tracking-widest text-neutral-500">
+              Select Variant / Item
+            </label>
+            {selectedVariant?.name && (
+              <span className="text-primary font-serif font-semibold text-sm">
+                {selectedVariant.name}
+              </span>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {product.variants.map((v, idx) => {
+              const isSelected =
+                (selectedVariant?.id && v.id && selectedVariant.id === v.id) ||
+                (selectedVariant?.name &&
+                  v.name &&
+                  selectedVariant.name === v.name) ||
+                selectedVariant === v ||
+                (!selectedVariant && idx === 0);
+
+              const previewImg = v.images?.[0] || product.images?.[0];
+              const variantTitle =
+                v.name ||
+                (Array.isArray(v.color) ? v.color.join(" / ") : v.color) ||
+                v.style ||
+                `Variant #${idx + 1}`;
+
+              const colorText = Array.isArray(v.color)
+                ? v.color.join(" / ")
+                : v.color || v.color_names?.join(" / ") || null;
+
+              const sizeText =
+                v.sizes?.length > 0 ? v.sizes.join(", ") : v.size_name || null;
+
+              const vPrice = Number(v.price);
+              const vPriceFormatted =
+                !isNaN(vPrice) && v.price !== null && v.price !== undefined
+                  ? vPrice.toFixed(2)
+                  : null;
+
+              return (
+                <button
+                  key={v.id || idx}
+                  type="button"
+                  onClick={() => onSelectVariant(v)}
+                  className={`flex items-center gap-3.5 p-3 rounded-2xl border text-left transition-all duration-300 cursor-pointer ${
+                    isSelected
+                      ? "border-primary bg-white shadow-md ring-2 ring-primary/30 text-neutral-900 font-semibold"
+                      : "border-neutral-200 bg-white/70 text-neutral-700 hover:border-primary/50 hover:bg-white shadow-sm"
+                  }`}
+                >
+                  {previewImg && (
+                    <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-neutral-100 shrink-0 border border-neutral-200 shadow-inner">
+                      <img
+                        src={previewImg}
+                        alt={variantTitle}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="flex flex-col min-w-0 flex-1">
+                    <span className="text-xs sm:text-sm font-semibold truncate leading-tight">
+                      {variantTitle}
+                    </span>
+                    {(colorText || sizeText) && (
+                      <span className="text-[11px] text-neutral-500 font-medium mt-0.5 truncate">
+                        {colorText && <span>Color: {colorText}</span>}
+                        {colorText && sizeText && <span> • </span>}
+                        {sizeText && <span>Sizes: {sizeText}</span>}
+                      </span>
+                    )}
+                    {vPriceFormatted && (
+                      <span className="text-[11px] text-primary font-bold mt-0.5">
+                        {vPriceFormatted} {CURRENCY}
+                      </span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
 
-      {/* Colors Selection (Nested or Direct) */}
-      {(() => {
-        const colorsToShow =
-          selectedVariant?.colors ||
-          (!product.variants?.some((v) => v.style) ? product.variants : null);
-
-        if (!colorsToShow?.length) return null;
-
-        return (
-          <div className="mb-6">
-            <label className="text-xs sm:text-sm font-bold uppercase tracking-widest text-neutral-500 mb-3 block">
-              Select Color
-            </label>
-            <div className="flex flex-wrap gap-4">
-              {colorsToShow.map((c, idx) => {
-                const isArrayColor = Array.isArray(c.color);
-                const colorLabel = isArrayColor ? c.color.join(" / ") : c.color;
-
-                const hexes = Array.isArray(c.color_hexes)
-                  ? c.color_hexes
-                  : (c.color_hexes ? [c.color_hexes] : []);
-
-                let backgroundStyle = {};
-                if (hexes.length > 1) {
-                  backgroundStyle = {
-                    background: `conic-gradient(${hexes
-                      .map((hex, i) => {
-                        const start = (i * 360) / hexes.length;
-                        const end = ((i + 1) * 360) / hexes.length;
-                        return `${hex} ${start}deg ${end}deg`;
-                      })
-                      .join(", ")})`,
-                  };
-                } else if (hexes.length === 1) {
-                  const val = hexes[0];
-                  if (val.startsWith("linear-gradient") || val.startsWith("conic-gradient")) {
-                    backgroundStyle = { background: val };
-                  } else {
-                    backgroundStyle = { backgroundColor: val };
-                  }
-                } else {
-                  backgroundStyle = { backgroundColor: (c.color || "").toLowerCase() };
-                }
-
-                const isSelected =
-                  selectedVariant?.selectedColor?.color === c.color ||
-                  (!selectedVariant?.selectedColor &&
-                    selectedVariant?.color === c.color);
-
-                return (
-                  <button
-                    key={colorLabel || idx}
-                    onClick={() => {
-                      if (selectedVariant?.style) {
-                        onSelectVariant({
-                          ...selectedVariant,
-                          selectedColor: c,
-                        });
-                      } else {
-                        onSelectVariant(c);
-                      }
-                    }}
-                    className={`flex items-center gap-3 p-2 pr-5 rounded-full border transition-all duration-300 cursor-pointer ${
-                      isSelected
-                        ? "border-primary bg-white shadow-sm ring-2 ring-primary/25 ring-offset-1 text-primary font-bold"
-                        : "border-neutral-300 bg-white/70 text-neutral-700 hover:border-primary hover:text-primary hover:bg-white shadow-sm hover:shadow"
-                    }`}
-                  >
-                    <span
-                      className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border border-black/10 shadow-inner"
-                      style={backgroundStyle}
-                    />
-                    {colorLabel && (
-                      <span className="text-xs sm:text-sm font-medium">
-                        {colorLabel}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })()}
-
-      {/* Sizes */}
-      {product.sizes?.length > 0 && (
+      {/* Available Sizes for Selected Variant */}
+      {availableSizes?.length > 0 && (
         <div className="mb-6">
           <label className="text-xs sm:text-sm font-bold uppercase tracking-widest text-neutral-500 mb-3 block">
             Select Size
           </label>
           <div className="flex flex-wrap gap-3">
-            {product.sizes.map((s) => {
+            {availableSizes.map((s) => {
               const sizeLabel = typeof s === "object" ? s.size : s;
               const isSelected =
                 (typeof selectedSize === "object"
                   ? selectedSize?.size
-                  : selectedSize) === sizeLabel;
+                  : selectedSize) === sizeLabel ||
+                (!selectedSize && availableSizes.length === 1);
 
               return (
                 <button
                   key={sizeLabel}
+                  type="button"
                   onClick={() => onSelectSize(s)}
                   className={`px-5 py-2 rounded-full border text-xs sm:text-sm font-semibold transition-all duration-300 cursor-pointer ${
                     isSelected
@@ -211,7 +212,7 @@ export default function ProductInfo({
         </div>
       )}
 
-      <div className="w-full h-px bg-white/40 my-8 border-t border-white/20" />
+      <div className="w-full h-px bg-border my-6" />
 
       {/* Actions */}
       <div className="flex flex-col gap-4">
@@ -224,7 +225,7 @@ export default function ProductInfo({
               quantity={qty}
               onIncrement={() => setQty((q) => Math.min(99, q + 1))}
               onDecrement={() => setQty((q) => Math.max(1, q - 1))}
-              className="h-10 sm:h-14 border border-white/60 bg-glass/20 rounded-xl"
+              className="h-10 sm:h-14 border border-neutral-300 rounded-xl"
             />
           </div>
 
@@ -232,7 +233,7 @@ export default function ProductInfo({
             {product.sold_out ? (
               <Button
                 disabled
-                className="w-full h-10 sm:h-14 bg-glass/20 text-neutral-400 border border-white/40 shadow-none cursor-not-allowed"
+                className="w-full h-10 sm:h-14 bg-neutral-100 text-neutral-400 border border-neutral-200 shadow-none cursor-not-allowed"
               >
                 Sold Out
               </Button>
@@ -240,7 +241,7 @@ export default function ProductInfo({
               <Button
                 onClick={onRemove}
                 variant="outline"
-                className="w-full h-10 sm:h-14 gap-2 text-danger hover:text-danger hover:border-danger hover:bg-danger/5 border-danger/35"
+                className="w-full h-10 sm:h-14 gap-2 text-danger hover:text-danger hover:border-danger hover:bg-danger/5 border-danger/35 cursor-pointer"
               >
                 <HiOutlineTrash className="text-lg sm:text-xl" />
                 Remove from Cart
@@ -249,7 +250,7 @@ export default function ProductInfo({
               <Button
                 onClick={handleAdd}
                 variant="primary"
-                className="w-full h-10 sm:h-14 gap-2 shadow-lg shadow-primary/20 text-md sm:text-lg hover:shadow-primary/30"
+                className="w-full h-10 sm:h-14 gap-2 shadow-lg shadow-primary/20 text-md sm:text-lg hover:shadow-primary/30 cursor-pointer"
               >
                 <RiShoppingBagLine className="text-lg sm:text-xl" />
                 Add to Cart
@@ -274,7 +275,7 @@ export default function ProductInfo({
         product={product}
         selectedVariant={selectedVariant}
         selectedSize={selectedSize}
-        price={price ?? selectedSize?.price ?? product.price}
+        price={parsedPrice}
       />
     </div>
   );

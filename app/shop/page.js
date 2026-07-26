@@ -9,8 +9,8 @@ import {
 } from "react-icons/ri";
 
 import SearchBar from "src/components/molecules/SearchBar";
-import FilterSidebar from "src/components/organisms/FilterSidebar";
-import ProductGrid from "src/components/organisms/ProductGrid";
+import FilterSidebar from "src/components/organisms/shop/FilterSidebar";
+import ProductGrid from "src/components/organisms/shop/ProductGrid";
 import Pagination from "src/components/molecules/Pagination";
 import ActiveFilters from "src/components/molecules/ActiveFilters";
 import Button from "src/components/atoms/Button";
@@ -18,6 +18,9 @@ import {
   useLazyGetFacetsQuery,
   useLazySearchProductsQuery,
 } from "src/services/api/productsApi";
+
+import ParticleBackground3D from "src/components/3d/ParticleBackground3D";
+import { RiSparklingLine } from "react-icons/ri";
 
 export default function ShopPage() {
   const { selectedCategory } = useSelector((s) => s.general) || {};
@@ -112,11 +115,17 @@ export default function ShopPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-bg text-base px-4 sm:px-8 py-10 sm:py-16">
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-2xl sm:text-3xl font-serif font-medium text-center mb-8">
-          Shop Collections
-        </h1>
+    <main className="min-h-screen bg-[#FDFBF7] text-base px-4 sm:px-8 py-10 sm:py-16 relative overflow-hidden">
+      <ParticleBackground3D />
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="text-center mb-10">
+          <span className="inline-flex items-center gap-1.5 text-primary font-display uppercase tracking-widest text-xs font-bold mb-2">
+            <RiSparklingLine className="text-base animate-pulse" /> 3D Handcrafted Collection
+          </span>
+          <h1 className="text-3xl sm:text-5xl font-serif font-medium text-neutral-900">
+            Shop Catalog
+          </h1>
+        </div>
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between mb-8">
           <div className="w-full sm:max-w-md">

@@ -148,6 +148,7 @@ export default function ProductVariantsList({
               const colorName =
                 colorsList.find((c) => c.id === v.colorIds?.[0])?.name || "";
               const colorSummary = colorName ? ` (${colorName})` : "";
+              const previewImg = v.images?.[0] || null;
 
               return (
                 <div
@@ -155,13 +156,32 @@ export default function ProductVariantsList({
                   className="border border-neutral-200 bg-white rounded-2xl p-4 shadow-sm space-y-4 animate-in fade-in"
                 >
                   {/* Card Header summary */}
-                  <div className="flex items-center justify-between border-b border-neutral-100 pb-2 flex-wrap gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-primary" />
-                      <span className="font-bold text-neutral-700 text-sm">
-                        Variant #{vIdx + 1}: {sizeSummary}
-                        {colorSummary}
-                      </span>
+                  <div className="flex items-center justify-between border-b border-neutral-100 pb-3 flex-wrap gap-2">
+                    <div className="flex items-center gap-3">
+                      {previewImg ? (
+                        <div
+                          onClick={() => previewImage(previewImg)}
+                          className="w-10 h-10 rounded-lg border border-neutral-200 bg-neutral-100 overflow-hidden shrink-0 cursor-zoom-in shadow-inner"
+                        >
+                          <img
+                            src={previewImg}
+                            alt="Preview"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <span className="w-3 h-3 rounded-full bg-primary shrink-0" />
+                      )}
+                      <div className="flex flex-col">
+                        <span className="font-bold text-neutral-800 text-sm">
+                          Variant #{vIdx + 1}: {v.name || `${sizeSummary}${colorSummary}`}
+                        </span>
+                        {previewImg && (
+                          <span className="text-[10px] text-primary font-medium">
+                            First Image Set as Variant Preview
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <button
                       type="button"
@@ -174,6 +194,27 @@ export default function ProductVariantsList({
 
                   {/* Card Fields Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {/* Variant Title / Name Field */}
+                    <div className="lg:col-span-4">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 mb-1 block">
+                        Variant Title / Name (e.g. White Pearl Flower Set, Ruby Diamond Set)
+                      </label>
+                      <input
+                        type="text"
+                        value={v.name || ""}
+                        onChange={(e) => {
+                          const nameVal = e.target.value;
+                          setVariants((prev) =>
+                            prev.map((item, i) =>
+                              i === vIdx ? { ...item, name: nameVal } : item
+                            )
+                          );
+                        }}
+                        placeholder="e.g. White Pearl Flower Set"
+                        className="w-full h-10 text-xs rounded-xl border border-neutral-300 bg-white px-3 focus:ring-1 focus:ring-primary focus:outline-none"
+                      />
+                    </div>
+
                     {/* Size Dropdown Select */}
                     <div className="lg:col-span-2">
                       <MultiselectDropdown
@@ -260,7 +301,7 @@ export default function ProductVariantsList({
                     {/* Variant Gallery Image URLs list */}
                     <div className="md:col-span-2 lg:col-span-4 space-y-2">
                       <label className="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block">
-                        Variant Gallery Images
+                        Variant Gallery Images (1st image is preview image)
                       </label>
                       <div className="space-y-2.5">
                         {v.images?.map((url, imgIdx) => (
@@ -292,7 +333,11 @@ export default function ProductVariantsList({
                               onChange={(e) =>
                                 onUpdateVariantImage(vIdx, imgIdx, e.target.value)
                               }
-                              placeholder="Paste Variant Image URL here..."
+                              placeholder={
+                                imgIdx === 0
+                                  ? "1st Image URL (Variant Preview Image)..."
+                                  : "Paste Variant Image URL here..."
+                              }
                               className="flex-1 rounded-xl h-9 border border-neutral-300 bg-white px-3 text-xs focus:ring-2 focus:ring-primary/45 focus:border-primary focus:outline-none"
                             />
                             <button

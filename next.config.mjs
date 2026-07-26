@@ -10,7 +10,7 @@ const nextConfig = {
     ],
   },
   // Allow local network IP for development access
-  allowedDevOrigins: ["192.168.0.57"],
+  allowedDevOrigins: ["192.168.0.57", "10.164.29.58"],
 };
 
 export default nextConfig;

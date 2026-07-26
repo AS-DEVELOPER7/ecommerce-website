@@ -10,9 +10,9 @@ import {
   useLazySearchProductsQuery,
 } from "src/services/api/productsApi";
 
-import ProductGallery from "src/components/organisms/ProductGallery";
-import ProductInfo from "src/components/organisms/ProductInfo";
-import RelatedProducts from "src/components/organisms/RelatedProducts";
+import ProductGallery from "src/components/organisms/product/ProductGallery";
+import ProductInfo from "src/components/organisms/product/ProductInfo";
+import RelatedProducts from "src/components/organisms/product/RelatedProducts";
 import { CURRENCY } from "src/constants";
 
 export default function ProductDetails() {
@@ -27,45 +27,118 @@ export default function ProductDetails() {
     if (id) getProductById(id);
   }, [id, getProductById]);
 
-  const variants = product?.variants ? [...product.variants] : [];
+  const rawVars =
+    product?.rawVariants && product.rawVariants.length > 0
+      ? product.rawVariants
+      : product?.variants && product.variants.length > 0
+      ? product.variants
+      : [];
+
+  // Consolidate DB variant rows by name/color into unique storefront variant cards
+  const variants = [];
+  rawVars.forEach((rv) => {
+    const match = variants.find((v) => {
+      if (rv.name && v.name) return rv.name === v.name;
+      const sameColors = JSON.stringify(v.color_names) === JSON.stringify(rv.color_names);
+      const sameImages = JSON.stringify(v.images) === JSON.stringify(rv.images);
+      return sameColors && sameImages;
+    });
+
+    if (match) {
+      if (rv.size_name && !match.sizes?.includes(rv.size_name)) {
+        match.sizes.push(rv.size_name);
+      }
+    } else {
+      variants.push({
+        ...rv,
+        color: rv.color_names?.length ? rv.color_names.join(" / ") : rv.color || null,
+        sizes: rv.size_name ? [rv.size_name] : (rv.sizes || []),
+      });
+    }
+  });
+
   const enhancedProduct = { ...product, variants };
 
   const defaultVariant = enhancedProduct?.variants?.[0] || null;
-  const defaultSize = product?.sizes?.[0] || null;
+  const initialSize =
+    defaultVariant?.sizes?.[0] ||
+    defaultVariant?.size_name ||
+    product?.sizes?.[0] ||
+    null;
+
   const [selectedVariant, setSelectedVariant] = useState(defaultVariant);
-  const [selectedSize, setSelectedSize] = useState(defaultSize);
+  const [selectedSize, setSelectedSize] = useState(initialSize);
   const [qty, setQty] = useState(1);
 
-  useEffect(() => {
-    const defaultV = product?.variants?.[0] || null;
-    if (defaultV && defaultV.style && defaultV.colors?.length) {
-      setSelectedVariant({
-        ...defaultV,
-        selectedStyle: defaultV,
-        selectedColor: defaultV.colors[0],
-      });
-    } else {
-      setSelectedVariant(defaultV);
+  const handleSelectVariant = (v) => {
+    setSelectedVariant(v);
+    const firstSize =
+      v?.sizes?.[0] ||
+      v?.size_name ||
+      product?.sizes?.[0] ||
+      null;
+    if (firstSize) {
+      setSelectedSize(firstSize);
     }
-    setSelectedSize(defaultSize);
-    setQty(1);
-  }, [product?.id, defaultSize]);
+  };
 
-  const [searchProducts, { data: relatedProductsData }] =
+  useEffect(() => {
+    if (!product) return;
+    const vars = enhancedProduct?.variants || [];
+    const defaultV = vars[0] || null;
+    setSelectedVariant(defaultV);
+    const firstSize =
+      defaultV?.sizes?.[0] ||
+      defaultV?.size_name ||
+      product.sizes?.[0] ||
+      null;
+    setSelectedSize(firstSize);
+    setQty(1);
+  }, [product?.id]);
+
+  // Query category-matched related products with guaranteed catalog fallback
+  const [searchCategoryProducts, { data: categoryProductsData }] =
+    useLazySearchProductsQuery();
+  const [searchFallbackProducts, { data: fallbackProductsData }] =
     useLazySearchProductsQuery();
 
+  const firstCategory =
+    (Array.isArray(product?.categories) ? product.categories[0] : product?.categories) ||
+    product?.categoryIds?.[0] ||
+    null;
+
   useEffect(() => {
-    if (product?.categories?.[0]) {
-      searchProducts({ category: product.categories[0] });
+    if (product?.id) {
+      if (firstCategory) {
+        searchCategoryProducts({ category: firstCategory, limit: 10 });
+      }
+      searchFallbackProducts({ limit: 10 });
     }
-  }, [product, searchProducts]);
+  }, [product?.id, firstCategory, searchCategoryProducts, searchFallbackProducts]);
 
   const related = useMemo(() => {
-    if (!product || !relatedProductsData) return [];
-    return (relatedProductsData.data || [])
-      .filter((p) => p.id !== product.id)
-      .slice(0, 4);
-  }, [product, relatedProductsData]);
+    if (!product) return [];
+
+    const categoryList = Array.isArray(categoryProductsData)
+      ? categoryProductsData
+      : categoryProductsData?.data || [];
+
+    const fallbackList = Array.isArray(fallbackProductsData)
+      ? fallbackProductsData
+      : fallbackProductsData?.data || [];
+
+    const categoryMatches = categoryList.filter((p) => p.id !== product.id);
+    const fallbackMatches = fallbackList.filter((p) => p.id !== product.id);
+
+    const combined = [...categoryMatches];
+    fallbackMatches.forEach((p) => {
+      if (combined.length < 4 && !combined.some((item) => item.id === p.id)) {
+        combined.push(p);
+      }
+    });
+
+    return combined.slice(0, 4);
+  }, [product, categoryProductsData, fallbackProductsData]);
 
   const currentSizeLabel =
     typeof selectedSize === "object" ? selectedSize?.size : selectedSize;
@@ -81,20 +154,19 @@ export default function ProductDetails() {
       i.size === (currentSizeLabel || null),
   );
 
-  // Reset local qty state to 1 when selected variant or size changes
   useEffect(() => {
     setQty(1);
   }, [selectedVariant, selectedSize]);
 
   if (isLoading || !product) {
     return (
-      <main className="bg-bg min-h-screen pt-24 pb-12 px-4 flex justify-center">
+      <main className="bg-[#FDFBF7] min-h-screen pt-24 pb-12 px-4 flex justify-center">
         <div className="animate-pulse w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-16">
-          <div className="aspect-4/5 bg-surface-base rounded-2xl w-full"></div>
+          <div className="aspect-4/5 bg-surface-base rounded-3xl w-full"></div>
           <div className="space-y-6 pt-10">
-            <div className="h-10 bg-surface-base rounded-lg w-3/4"></div>
-            <div className="h-6 bg-surface-base rounded-lg w-1/4"></div>
-            <div className="h-32 bg-surface-base rounded-lg w-full mt-10"></div>
+            <div className="h-10 bg-surface-base rounded-xl w-3/4"></div>
+            <div className="h-6 bg-surface-base rounded-xl w-1/4"></div>
+            <div className="h-32 bg-surface-base rounded-xl w-full mt-10"></div>
           </div>
         </div>
       </main>
@@ -117,12 +189,13 @@ export default function ProductDetails() {
       selectedVariant?.selectedStyle?.images?.[0] ||
       product?.images?.[0];
 
-    const finalPrice = selectedSize?.price ?? product.price;
+    const finalPrice = selectedVariant?.price ?? selectedSize?.price ?? product.price;
 
     dispatch(
       addToCart({
         id: product.id,
         name: product.title,
+        variantName: selectedVariant?.name || null,
         style: selectedVariant?.style || null,
         color:
           selectedVariant?.selectedColor?.color ||
@@ -144,25 +217,25 @@ export default function ProductDetails() {
   };
 
   return (
-    <main className="bg-bg text-base min-h-screen">
+    <main className="bg-[#FDFBF7] text-base min-h-screen">
       {/* Breadcrumbs */}
       <div className="px-4 sm:px-8 lg:px-16 py-8">
         <div className="max-w-7xl mx-auto flex flex-wrap gap-2 text-sm font-medium tracking-wide">
           <Link
             href="/"
-            className="text-muted hover:text-primary transition-colors"
+            className="text-neutral-500 hover:text-primary transition-colors"
           >
             Home
           </Link>
-          <span className="text-border">/</span>
+          <span className="text-neutral-300">/</span>
           <Link
             href="/shop"
-            className="text-muted hover:text-primary transition-colors"
+            className="text-neutral-500 hover:text-primary transition-colors"
           >
             Shop
           </Link>
-          <span className="text-border">/</span>
-          <span className="text-base truncate max-w-[200px] sm:max-w-md">
+          <span className="text-neutral-300">/</span>
+          <span className="text-neutral-900 font-semibold truncate max-w-[200px] sm:max-w-md">
             {product.title}
           </span>
         </div>
@@ -174,13 +247,13 @@ export default function ProductDetails() {
           <ProductGallery
             product={enhancedProduct}
             selectedVariant={selectedVariant}
-            onSelectVariant={setSelectedVariant}
+            onSelectVariant={handleSelectVariant}
           />
 
           <ProductInfo
             product={enhancedProduct}
             selectedVariant={selectedVariant}
-            onSelectVariant={setSelectedVariant}
+            onSelectVariant={handleSelectVariant}
             selectedSize={selectedSize}
             onSelectSize={setSelectedSize}
             qty={itemInCart ? itemInCart.qty : qty}
@@ -192,13 +265,13 @@ export default function ProductDetails() {
         </div>
 
         {/* Description / Extra Details Section */}
-        <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-border">
+        <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-border">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="md:col-span-1 border-b border-border md:border-none pb-4 md:pb-0">
-              <h3 className="font-serif text-xl sm:text-2xl font-medium mb-4">
+              <h3 className="font-serif text-xl sm:text-2xl font-medium mb-4 text-neutral-900">
                 The Details
               </h3>
-              <p className="text-sm sm:text-base text-muted leading-relaxed font-light">
+              <p className="text-sm sm:text-base text-neutral-600 leading-relaxed font-normal">
                 Designed for daily elegance, crafted with lasting materials.
                 Pair it with matching pieces in our collection for a refined
                 set.
@@ -206,12 +279,11 @@ export default function ProductDetails() {
             </div>
 
             <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-1 gap-8">
-              
-              <div className="bg-surface-base p-8 rounded-2xl">
-                <h4 className="font-semibold uppercase tracking-widest text-xs sm:text-sm mb-4">
+              <div className="bg-white/80 p-8 rounded-3xl border border-border shadow-sm">
+                <h4 className="font-semibold uppercase tracking-widest text-xs sm:text-sm mb-4 text-neutral-900">
                   Care Guide
                 </h4>
-                <p className="text-xs sm:text-sm text-muted leading-relaxed">
+                <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
                   Gently wipe with a soft cloth after wear to retain its
                   brilliant shine. Store in the provided pouch in a cool, dry
                   place. Avoid contact with perfumes and lotions.
@@ -221,7 +293,7 @@ export default function ProductDetails() {
           </div>
         </div>
 
-        <RelatedProducts related={related} />
+        <RelatedProducts products={related} />
       </div>
     </main>
   );

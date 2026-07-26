@@ -50,21 +50,25 @@ export async function GET(req, { params }) {
     .select("size_id")
     .eq("product_id", id);
 
-  // 5. Fetch raw variants with colors
+  // 5. Fetch raw variants with size names & color details
   const { data: variants } = await supabaseServer
     .from("product_variants")
-    .select("*, product_variant_colors(color_id)")
+    .select("*, sizes(id, name), product_variant_colors(color_id, colors(id, name, hex_code))")
     .eq("product_id", id);
 
-  // Format variants to contain a flat colorIds array
+  // Format variants to contain flat size_name, color_names, color_hexes
   const formattedVariants = (variants || []).map(v => ({
     id: v.id,
     product_id: v.product_id,
+    name: v.name || "",
     size_id: v.size_id,
+    size_name: v.sizes?.name || null,
     stock: v.stock,
     price: v.price,
-    images: v.images,
-    colorIds: v.product_variant_colors?.map(pvc => pvc.color_id) || []
+    images: v.images || [],
+    colorIds: v.product_variant_colors?.map(pvc => pvc.color_id).filter(Boolean) || [],
+    color_names: v.product_variant_colors?.map(pvc => pvc.colors?.name).filter(Boolean) || [],
+    color_hexes: v.product_variant_colors?.map(pvc => pvc.colors?.hex_code).filter(Boolean) || [],
   }));
 
   // Combine into unified payload
@@ -194,6 +198,7 @@ export async function PUT(req, { params }) {
           const { error: varUpdErr } = await supabaseServer
             .from("product_variants")
             .update({
+              name: variant.name || null,
               size_id: variant.size_id || null,
               stock: variant.stock !== undefined ? Number(variant.stock) : 0,
               price: variant.price !== undefined && variant.price !== null ? Number(variant.price) : null,
@@ -225,6 +230,7 @@ export async function PUT(req, { params }) {
             .from("product_variants")
             .insert({
               product_id: id,
+              name: variant.name || null,
               size_id: variant.size_id || null,
               stock: variant.stock !== undefined ? Number(variant.stock) : 0,
               price: variant.price !== undefined && variant.price !== null ? Number(variant.price) : null,

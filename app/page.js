@@ -1,7 +1,7 @@
 "use client";
 
 import HeroSection from "src/components/organisms/HeroSection";
-import FeaturedProducts from "src/components/organisms/FeaturedProducts";
+import FeaturedProducts from "src/components/organisms/home/FeaturedProducts";
 import ExploreCollection from "src/components/organisms/ExploreCollection";
 import OurStory from "src/components/organisms/OurStory";
 import NewsLetter from "src/components/organisms/NewsLetter";

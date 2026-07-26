@@ -69,6 +69,7 @@ export default function AdminNewProduct() {
     setVariants([
       ...variants,
       {
+        name: "",
         size_id: null,
         size_name: "Free Size",
         colorIds: [],
@@ -224,6 +225,7 @@ export default function AdminNewProduct() {
           if (v.sizeIds && v.sizeIds.length > 0) {
             v.sizeIds.forEach((szId) => {
               apiVars.push({
+                name: v.name || "",
                 size_id: szId,
                 stock: Number(v.stock),
                 price: v.price !== null && v.price !== "" ? Number(v.price) : null,
@@ -233,6 +235,7 @@ export default function AdminNewProduct() {
             });
           } else {
             apiVars.push({
+              name: v.name || "",
               size_id: null,
               stock: Number(v.stock),
               price: v.price !== null && v.price !== "" ? Number(v.price) : null,

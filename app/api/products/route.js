@@ -49,6 +49,7 @@ export async function GET(req) {
         .filter(v => v.product_id === product.id)
         .map(v => ({
           id: v.id,
+          name: v.name || "",
           size_id: v.size_id,
           sizes: v.sizes ? { name: v.sizes.name } : null,
           stock: v.stock || 0,
@@ -173,6 +174,7 @@ export async function POST(req) {
           .from("product_variants")
           .insert({
             product_id: productId,
+            name: variant.name || null,
             size_id: variant.size_id || null,
             stock: variant.stock !== undefined ? Number(variant.stock) : 0,
             price: variant.price !== undefined && variant.price !== null ? Number(variant.price) : null,

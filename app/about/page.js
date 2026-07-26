@@ -4,65 +4,82 @@ import Image from "next/image";
 import { FaHammer, FaLeaf, FaHeart } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { ABOUT_US_IMAGES } from "src/constants/images";
+import Interactive3DCard from "src/components/3d/Interactive3DCard";
+import ParticleBackground3D from "src/components/3d/ParticleBackground3D";
+import { RiSparklingLine } from "react-icons/ri";
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-background-light  dark:bg-background-dark text-brand-charcoal dark:text-gray-200">
-      {/* Hero Section */}
-      <HeroSection />
+    <main className="min-h-screen bg-[#FDFBF7] text-neutral-900 relative overflow-hidden">
+      <ParticleBackground3D />
+      <div className="relative z-10">
+        {/* Hero Section */}
+        <HeroSection />
 
-      {/* Intro */}
-      <IntroSection />
+        {/* Intro */}
+        <IntroSection />
 
-      {/* Founder */}
-      <FounderSection />
+        {/* Founder */}
+        <FounderSection />
 
-      {/* Values */}
-      <OurValuesSection />
+        {/* Values */}
+        <OurValuesSection />
 
-      {/* Behind the Scenes */}
-      <BehindTheScenes />
+        {/* Behind the Scenes */}
+        <BehindTheScenes />
 
-      {/* CTA */}
-      <JewelryCTA />
+        {/* CTA */}
+        <JewelryCTA />
+      </div>
     </main>
   );
 }
+
 function JewelryCTA() {
   const router = useRouter();
   return (
-    <section className="text-center py-10 sm:py-16 px-6 bg-accent">
-      <h3 className="text-xl sm:text-2xl font-bold mb-3 text-primary">
-        Find a Piece that Tells Your Story
-      </h3>
-      <p className="max-w-xl mx-auto mb-6 text-muted text-sm sm:text-base">
-        Explore our collections and discover handcrafted jewelry that’s as
-        unique as you are.
-      </p>
-      <button
-        onClick={() => router.push("/shop")}
-        className="inline-flex  p-3 sm:p-4 px-6 sm:px-8 bg-primary text-bg font-semibold rounded-full hover:bg-primary/90 transition"
-      >
-        Explore Jewelry
-      </button>
+    <section className="text-center py-12 sm:py-20 px-6 bg-gradient-to-r from-primary/10 via-amber-500/10 to-primary/10 border-t border-border">
+      <div className="max-w-3xl mx-auto">
+        <span className="inline-flex items-center gap-1.5 text-primary font-display uppercase tracking-widest text-xs font-bold mb-3">
+          <RiSparklingLine className="text-base animate-pulse" /> Timeless Treasures
+        </span>
+        <h3 className="text-2xl sm:text-4xl font-serif font-medium mb-4 text-neutral-900">
+          Find a Piece that Tells Your Story
+        </h3>
+        <p className="max-w-xl mx-auto mb-8 text-neutral-600 text-sm sm:text-base font-normal">
+          Explore our collections and discover handcrafted jewelry that’s as unique as you are in an interactive 3D experience.
+        </p>
+        <button
+          onClick={() => router.push("/shop")}
+          className="inline-flex items-center gap-2 py-4 px-8 bg-primary hover:bg-pink-600 text-white font-semibold rounded-full shadow-[0_8px_25px_rgba(238,43,140,0.3)] hover:scale-105 transition-all"
+        >
+          Explore 3D Jewelry <RiSparklingLine className="text-lg" />
+        </button>
+      </div>
     </section>
   );
 }
 
 function BehindTheScenes() {
   return (
-    <section className="max-w-6xl mx-auto px-6 py-10 sm:py-16">
-      <h2 className="text-2xl sm:text-3xl font-bold text-center text-primary mb-8">
-        Behind the Scenes
-      </h2>
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">
+    <section className="max-w-6xl mx-auto px-6 py-12 sm:py-20">
+      <div className="text-center mb-12">
+        <span className="text-primary font-display uppercase tracking-widest text-xs font-bold mb-2 block">
+          Artisanal Craftsmanship
+        </span>
+        <h2 className="text-3xl sm:text-4xl font-serif font-medium text-neutral-900">
+          Behind the Scenes
+        </h2>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
         {ABOUT_US_IMAGES.behindTheScene.map((src, i) => (
-          <div
-            key={i}
-            className="relative aspect-square rounded-lg overflow-hidden"
-          >
-            <Image src={src} alt="Crafting" fill className="object-cover" />
-          </div>
+          <Interactive3DCard key={i} maxTilt={14} glare={true}>
+            <div className="relative aspect-square rounded-3xl overflow-hidden shadow-lg border border-white/80 group">
+              <Image src={src} alt="Crafting process" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+          </Interactive3DCard>
         ))}
       </div>
     </section>
@@ -72,41 +89,49 @@ function BehindTheScenes() {
 function OurValuesSection() {
   const ourValues = [
     {
-      icon: <FaHammer className="text-xl sm:text-3xl" />,
+      icon: <FaHammer className="text-xl sm:text-2xl" />,
       title: "Authentic Craftsmanship",
       desc: "Every piece is meticulously handcrafted with attention to detail, ensuring exceptional quality and uniqueness.",
     },
     {
-      icon: <FaLeaf className="text-xl sm:text-3xl" />,
+      icon: <FaLeaf className="text-xl sm:text-2xl" />,
       title: "Sustainable Materials",
       desc: "We are committed to using ethically sourced and sustainable materials to protect our planet.",
     },
     {
-      icon: <FaHeart className="text-xl sm:text-3xl" />,
+      icon: <FaHeart className="text-xl sm:text-2xl" />,
       title: "Personal Connection",
       desc: "Our jewelry is designed to be more than an accessory; it’s a way to connect with your own story and style.",
     },
   ];
+
   return (
-    <section className="text-primary py-10 sm:py-16">
-      <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">
-        Our Core Values
-      </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-6xl mx-auto px-6">
-        {ourValues.map((v, i) => (
-          <div
-            key={i}
-            className="p-4 sm:p-6   border border-border rounded-xl text-center shadow-sm"
-          >
-            <div className="flex items-center justify-center w-14 h-14 rounded-full bg-primary/20 text-primary mx-auto mb-4">
-              {v.icon}
-            </div>
-            <h3 className="font-semibold text-base sm:text-lg mb-2">
-              {v.title}
-            </h3>
-            <p className="text-xs sm:text-sm text-muted ">{v.desc}</p>
-          </div>
-        ))}
+    <section className="py-12 sm:py-20 bg-surface-base/50">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="text-center mb-12">
+          <span className="text-primary font-display uppercase tracking-widest text-xs font-bold mb-2 block">
+            What Drives Us
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-serif font-medium text-neutral-900">
+            Our Core Values
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+          {ourValues.map((v, i) => (
+            <Interactive3DCard key={i} maxTilt={15} glare={true}>
+              <div className="p-8 bg-white/90 backdrop-blur-md border border-white rounded-3xl text-center shadow-[0_10px_30px_rgba(0,0,0,0.05)] h-full flex flex-col items-center">
+                <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 text-primary mb-6 shadow-sm">
+                  {v.icon}
+                </div>
+                <h3 className="font-serif text-xl font-semibold text-neutral-900 mb-3">
+                  {v.title}
+                </h3>
+                <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-normal">{v.desc}</p>
+              </div>
+            </Interactive3DCard>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -114,33 +139,36 @@ function OurValuesSection() {
 
 function FounderSection() {
   return (
-    <section className="max-w-6xl mx-auto px-6 py-10 sm:py-12 flex flex-col lg:flex-row items-center gap-10">
+    <section className="max-w-6xl mx-auto px-6 py-12 sm:py-20 flex flex-col lg:flex-row items-center gap-12 sm:gap-16">
       <div className="w-full lg:w-2/5">
-        <div className="relative aspect-3/4 rounded-lg overflow-hidden shadow-md">
-          <Image
-            src={ABOUT_US_IMAGES.behindTheScene[1]}
-            alt="Our Workshop"
-            fill
-            className="object-cover"
-          />
-        </div>
+        <Interactive3DCard maxTilt={14} glare={true}>
+          <div className="relative aspect-3/4 rounded-3xl overflow-hidden shadow-xl border border-white/80">
+            <Image
+              src={ABOUT_US_IMAGES.behindTheScene[1]}
+              alt="Our Workshop"
+              fill
+              className="object-cover"
+            />
+          </div>
+        </Interactive3DCard>
       </div>
-      <div className="flex-1 space-y-4">
-        <p className="uppercase text-primary font-semibold tracking-wider">
+
+      <div className="flex-1 space-y-5 text-left">
+        <span className="uppercase text-primary font-bold text-xs tracking-widest block">
           Our Founder
-        </p>
-        <h3 className="text-xl sm:text-2xl font-bold">
+        </span>
+        <h3 className="text-3xl sm:text-4xl font-serif font-medium text-neutral-900">
           Meet <span className="text-primary">Arwa Peeth</span>
         </h3>
-        <p className="text-muted text-sm sm:text-base leading-relaxed">
+        <p className="text-neutral-700 text-base sm:text-lg leading-relaxed font-normal">
           It all started with a simple idea and a desire to create something
           beautiful and meaningful. From a small workbench in my home, this
           passion grew into a full-time dedication to crafting pieces that bring
           joy and celebrate individuality.
         </p>
-        <p className="text-muted leading-relaxed">
+        <p className="text-neutral-600 leading-relaxed text-sm sm:text-base font-normal">
           Each design is inspired by nature, art, and the stories of the amazing
-          people I meet.
+          people I meet across Rajasthan and the world.
         </p>
       </div>
     </section>
@@ -149,11 +177,14 @@ function FounderSection() {
 
 function IntroSection() {
   return (
-    <section className="max-w-5xl text-primary mx-auto px-6 py-10 sm:py-16 text-center">
-      <h2 className="text-2xl sm:text-3xl font-serif font-medium mb-4">
-        Handcrafted with Love and Passion
+    <section className="max-w-4xl mx-auto px-6 py-12 sm:py-20 text-center">
+      <span className="inline-flex items-center gap-1.5 text-primary font-display uppercase tracking-widest text-xs font-bold mb-3">
+        <RiSparklingLine className="text-base" /> Artisanal Excellence
+      </span>
+      <h2 className="text-3xl sm:text-5xl font-serif font-medium mb-6 text-neutral-900 leading-tight">
+        Handcrafted with Love, Passion & 3D Precision
       </h2>
-      <p className=" text-muted  max-w-2xl sm:max-w-3xl mx-auto">
+      <p className="text-neutral-700 text-base sm:text-xl max-w-2xl sm:max-w-3xl mx-auto leading-relaxed font-normal">
         Welcome to our world of handcrafted jewelry, where every piece is a
         labor of love. We believe in creating beautiful, timeless jewelry that
         tells a story and connects with you on a personal level.
@@ -165,18 +196,23 @@ function IntroSection() {
 function HeroSection() {
   return (
     <section
-      className="flex flex-col items-center justify-center text-center bg-cover bg-center min-h-[40vh] sm:min-h-[60vh] px-4 py-10 sm:py-20"
+      className="relative flex flex-col items-center justify-center text-center bg-cover bg-center min-h-[45vh] sm:min-h-[60vh] px-4 py-16 sm:py-24 rounded-b-3xl overflow-hidden"
       style={{
-        backgroundImage: `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.5)), url(${ABOUT_US_IMAGES.hero})`,
+        backgroundImage: `linear-gradient(rgba(253, 251, 247, 0.4), rgba(253, 251, 247, 0.8)), url(${ABOUT_US_IMAGES.hero})`,
       }}
     >
-      <h1 className="text-2xl sm:text-5xl lg:text-6xl font-extrabold text-bg mb-3">
-        Our Story, Woven into Every Piece.
-      </h1>
-      <p className="text-surface max-w-2xl  text-sm sm:text-lg">
-        Discover the passion and craftsmanship behind our handcrafted jewelry,
-        made with love from our home to yours.
-      </p>
+      <div className="max-w-4xl mx-auto relative z-10">
+        <span className="inline-flex items-center gap-1.5 text-primary font-display uppercase tracking-widest text-xs font-bold mb-4 bg-white/80 px-4 py-1.5 rounded-full border border-white shadow-sm">
+          <RiSparklingLine className="text-base" /> Tarmal Story
+        </span>
+        <h1 className="text-3xl sm:text-6xl font-serif font-medium text-neutral-900 mb-6 drop-shadow-sm leading-tight">
+          Our Story, Woven into Every Piece.
+        </h1>
+        <p className="text-neutral-800 max-w-2xl mx-auto text-base sm:text-xl font-normal drop-shadow-sm">
+          Discover the passion and craftsmanship behind our handcrafted jewelry,
+          made with love from our home to yours.
+        </p>
+      </div>
     </section>
   );
 }

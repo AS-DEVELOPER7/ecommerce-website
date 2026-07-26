@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { FaLock } from "react-icons/fa";
 import { money } from "src/utils/money";
-import ImageWithFallback from "../../molecules/reusable/ImageWithFallback";
+import ImageWithFallback from "../../molecules/ImageWithFallback";
 
 export default function ReviewOrderDetails({
   setStep,

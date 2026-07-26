@@ -20,10 +20,10 @@ import {
 } from "src/constants";
 
 import Stepper from "src/components/molecules/Stepper";
-import CheckoutSummary from "src/components/organisms/CheckoutSummary";
-import ShippingDetailsForm from "src/components/organisms/ShippingDetailsForm";
-import PaymentOptions from "src/components/organisms/PaymentOptions";
-import ReviewOrderDetails from "src/components/organisms/ReviewOrderDetails";
+import CheckoutSummary from "src/components/organisms/checkout/CheckoutSummary";
+import ShippingDetailsForm from "src/components/organisms/checkout/ShippingDetailsForm";
+import PaymentOptions from "src/components/organisms/checkout/PaymentOptions";
+import ReviewOrderDetails from "src/components/organisms/checkout/ReviewOrderDetails";
 import { WEB3FORMS_NEW_ORDER_ACCESS_KEY } from "src/config/config";
 
 export default function CheckoutPage() {
